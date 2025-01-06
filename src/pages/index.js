@@ -13,52 +13,78 @@ export default function Home() {
   const worksRef = useRef(null);
   const triggerRef = useRef(null);
   const router = useRouter();
+  const [pageKey, setPageKey] = useState(0);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger);
+  // 初始化 ScrollTrigger
+  const initializeScrollTrigger = () => {
+    console.log("Initializing ScrollTrigger");
 
-      // 監聽路由變化
-      const handleRouteChangeStart = () => {
-        if (triggerRef.current) {
-          triggerRef.current.kill();
-        }
-      };
+    // 清理現有的 ScrollTrigger
+    ScrollTrigger.getAll().forEach((t) => t.kill());
 
-      const handleRouteChangeComplete = () => {
-        // 重新初始化 ScrollTrigger
-        setTimeout(() => {
-          if (worksRef.current) {
-            triggerRef.current = ScrollTrigger.create({
-              trigger: worksRef.current,
-              start: "top 90%",
-              end: "bottom top",
-              markers: true, // 開發時可以看到觸發點
-              onEnter: () => setIsWorksVisible(true),
-              onLeave: () => setIsWorksVisible(false),
-              onEnterBack: () => setIsWorksVisible(true),
-              onLeaveBack: () => setIsWorksVisible(false),
-            });
-            ScrollTrigger.refresh();
-          }
-        }, 500);
-      };
-
-      router.events.on("routeChangeStart", handleRouteChangeStart);
-      router.events.on("routeChangeComplete", handleRouteChangeComplete);
-
-      return () => {
-        router.events.off("routeChangeStart", handleRouteChangeStart);
-        router.events.off("routeChangeComplete", handleRouteChangeComplete);
-        if (triggerRef.current) {
-          triggerRef.current.kill();
-        }
-      };
+    // 創建新的 ScrollTrigger
+    if (worksRef.current) {
+      triggerRef.current = ScrollTrigger.create({
+        trigger: worksRef.current,
+        start: "top 90%",
+        end: "bottom top",
+        markers: true, // 開啟調試標記
+        onEnter: () => setIsWorksVisible(true),
+        onLeave: () => setIsWorksVisible(false),
+        onEnterBack: () => setIsWorksVisible(true),
+        onLeaveBack: () => setIsWorksVisible(false),
+      });
     }
+
+    // 強制刷新 ScrollTrigger
+    ScrollTrigger.refresh();
+  };
+
+  // 路由變化時的處理
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      console.log("Route change started");
+      setIsWorksVisible(false); // 重置狀態
+      ScrollTrigger.getAll().forEach((t) => t.kill()); // 清理 ScrollTrigger
+    };
+
+    const handleRouteChangeComplete = () => {
+      console.log("Route change completed");
+      setPageKey((prev) => prev + 1);
+      // 延遲初始化 ScrollTrigger，確保 DOM 準備好
+      setTimeout(() => {
+        initializeScrollTrigger();
+      }, 500); // 延遲 100 毫秒
+    };
+
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+    router.events.on("routeChangeComplete", handleRouteChangeComplete);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+      router.events.off("routeChangeComplete", handleRouteChangeComplete);
+      ScrollTrigger.getAll().forEach((t) => t.kill()); // 清理 ScrollTrigger
+    };
   }, [router]);
 
+  // 首次載入時初始化 ScrollTrigger
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (!gsap.plugins.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+      }
+
+      console.log("Initial load: Setting up ScrollTrigger");
+      initializeScrollTrigger();
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen font-['Funnel_Sans']">
+    <div className="flex flex-col min-h-screen" key={pageKey}>
       <main className="flex-grow">
         <div
           className={`transition-all duration-300 ${
@@ -68,9 +94,8 @@ export default function Home() {
           <Hero />
         </div>
         <section
-          className=" lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-white"
           ref={worksRef}
-          data-scroll-section
+          className="lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-white"
         >
           <h2 className="text-2xl font-bold text-white mb-8">Spotlight on</h2>
           <div>

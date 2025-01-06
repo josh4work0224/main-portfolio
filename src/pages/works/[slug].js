@@ -582,7 +582,7 @@ const WorkDetail = ({ work }) => {
               </div>
             </div>
           </div>
-          <div class="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-32 pt-0">
+          <div className="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-32 pt-0">
             <NextButton nextProject={nextProject} />
           </div>
         </div>

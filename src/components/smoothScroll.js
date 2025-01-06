@@ -15,7 +15,6 @@ export function LenisProvider({ children }) {
   const isInitialMount = useRef(true);
 
   const destroyLenis = () => {
-    console.log("🧹 Destroying Lenis instance");
     if (lenisRef.current) {
       lenisRef.current.destroy();
       lenisRef.current = null;
@@ -25,7 +24,6 @@ export function LenisProvider({ children }) {
   };
 
   const initLenis = () => {
-    console.log("🚀 Initializing Lenis for path:", router.asPath);
     destroyLenis();
 
     // 重置所有滾動相關樣式
@@ -49,8 +47,6 @@ export function LenisProvider({ children }) {
         infinite: false,
       });
 
-      console.log("✅ Lenis initialized");
-
       lenisRef.current.on("scroll", () => {
         ScrollTrigger.update();
       });
@@ -69,13 +65,11 @@ export function LenisProvider({ children }) {
 
   useEffect(() => {
     const handleRouteChangeStart = () => {
-      console.log("🛣️ Route change starting...");
       destroyLenis();
     };
 
     // 監聽自定義轉場完成事件
     const handleTransitionComplete = () => {
-      console.log("🎭 Page transition complete, initializing Lenis");
       initLenis();
       setTimeout(() => {
         ScrollTrigger.refresh(true);

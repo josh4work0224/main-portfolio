@@ -141,8 +141,10 @@ export default function Transition({ children }) {
                   setMosaicTiles([...tiles]);
                 },
                 onComplete: () => {
-                  // 觸發自定義事件通知轉場完成
-                  window.dispatchEvent(new Event("pageTransitionComplete"));
+                  setTimeout(() => {
+                    // 觸發自定義事件通知轉場完成
+                    window.dispatchEvent(new Event("pageTransitionComplete"));
+                  }, 100);
                 },
               });
             }, 1000);
