@@ -9,9 +9,8 @@ export default function Transition({ children }) {
   const [mosaicTiles, setMosaicTiles] = useState([]);
   const [showLogo, setShowLogo] = useState(false);
   const [clientLogo, setClientLogo] = useState(null);
-  const isFirstMount = useRef(true);
-  const scrollPosition = useRef(0);
   const router = useRouter();
+  const [prevPath, setPrevPath] = useState(router.asPath);
 
   const fetchWorkData = async (slug) => {
     const client = createClient({
@@ -81,83 +80,81 @@ export default function Transition({ children }) {
   };
 
   useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      setDisplayChildren(children);
-      return;
-    }
+    if (router.asPath !== prevPath) {
+      setPrevPath(router.asPath);
 
-    scrollPosition.current = window.scrollY;
+      const createAndFadeMosaic = async () => {
+        setMosaicTiles([]);
+        setShowLogo(false);
+        setClientLogo(null);
 
-    const createAndFadeMosaic = async () => {
-      setMosaicTiles([]);
-      setShowLogo(false);
-      setClientLogo(null);
+        const targetPath = router.asPath;
+        if (shouldShowLogo(targetPath)) {
+          const slug = targetPath.split("/works/")[1];
+          await fetchWorkData(slug);
+        }
 
-      const targetPath = router.asPath;
-      if (shouldShowLogo(targetPath)) {
-        const slug = targetPath.split("/works/")[1];
-        await fetchWorkData(slug);
-      }
+        const tiles = createMosaicTiles();
+        setMosaicTiles(tiles);
 
-      const tiles = createMosaicTiles();
-      setMosaicTiles(tiles);
+        // 進場動畫
+        gsap.to(tiles, {
+          opacity: 1,
+          duration: 0.3,
+          stagger: {
+            each: 0.02,
+            from: "start",
+            grid: [10, 20],
+            axis: "x",
+            amount: 0.5,
+          },
+          ease: "power2.inOut",
+          onUpdate: () => {
+            setMosaicTiles([...tiles]);
+          },
+          onComplete: () => {
+            if (shouldShowLogo(router.asPath)) {
+              setTimeout(() => {
+                setShowLogo(true);
+              }, 300);
+            }
 
-      // 進場動畫
-      gsap.to(tiles, {
-        opacity: 1,
-        duration: 0.3,
-        stagger: {
-          each: 0.02,
-          from: "start",
-          grid: [10, 20],
-          axis: "x",
-          amount: 0.5,
-        },
-        ease: "power2.inOut",
-        onUpdate: () => {
-          setMosaicTiles([...tiles]);
-        },
-        onComplete: () => {
-          if (shouldShowLogo(router.asPath)) {
+            // 新頁面切換
             setTimeout(() => {
-              setShowLogo(true);
-            }, 300);
-          }
+              setDisplayChildren(children);
+              window.scrollTo(0, 0);
 
-          // 新頁面切換
-          setTimeout(() => {
-            setDisplayChildren(children);
-            window.scrollTo(0, 0);
+              // 退場動畫
+              setShowLogo(false);
+              gsap.to(tiles, {
+                opacity: 0,
+                duration: 0.3,
+                stagger: {
+                  each: 0.02,
+                  from: "end",
+                  grid: [10, 20],
+                  axis: "x",
+                  amount: 0.5,
+                },
+                ease: "power2.inOut",
+                onUpdate: () => {
+                  setMosaicTiles([...tiles]);
+                },
+                onComplete: () => {
+                  // 觸發自定義事件通知轉場完成
+                  window.dispatchEvent(new Event("pageTransitionComplete"));
+                },
+              });
+            }, 1000);
+          },
+        });
+      };
 
-            // 退場動畫
-            setShowLogo(false);
-            gsap.to(tiles, {
-              opacity: 0,
-              duration: 0.3,
-              stagger: {
-                each: 0.02,
-                from: "end",
-                grid: [10, 20],
-                axis: "x",
-                amount: 0.5,
-              },
-              ease: "power2.inOut",
-              onUpdate: () => {
-                setMosaicTiles([...tiles]);
-              },
-              onComplete: () => {
-                // 觸發自定義事件通知轉場完成
-                window.dispatchEvent(new Event("pageTransitionComplete"));
-              },
-            });
-          }, 1000);
-        },
-      });
-    };
-
-    createAndFadeMosaic();
-  }, [children, router]);
+      createAndFadeMosaic();
+    } else {
+      setDisplayChildren(children);
+    }
+  }, [children, router.asPath]);
 
   return (
     <div className="relative w-full min-h-screen">

@@ -7,8 +7,6 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SplitType from "split-type";
 import RiveComp from "./RiveComp";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Hero() {
   const heroRef = useRef(null);
   const ghostRef = useRef(null);
@@ -179,217 +177,236 @@ export default function Hero() {
 
   // 修改初始化 ScrollTrigger 和 SplitText 的 useEffect
   useEffect(() => {
-    if (!heroRef.current) return;
+    // 確保在客戶端環境中
+    if (typeof window !== "undefined") {
+      // 在這裡註冊 ScrollTrigger
+      gsap.registerPlugin(ScrollTrigger);
 
-    const textElement = heroRef.current.querySelector(".split-text");
-    if (!textElement) return;
+      // 等待一下確保 DOM 完全載入
+      const timer = setTimeout(() => {
+        if (!heroRef.current) return;
 
-    // 將 ghostContainer 的創建移到 setTimeout 外部
-    const ghostContainer = document.createElement("div");
-    ghostContainer.className = "ghost-container";
-    ghostContainer.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: auto;
-      pointer-events: none;
-      z-index: 50;
-    `;
+        const textElement = heroRef.current.querySelector(".split-text");
+        if (!textElement) return;
 
-    // 添加 ghost container 到 DOM
-    heroRef.current.appendChild(ghostContainer);
-    ghostRef.current = ghostContainer;
+        // 將 ghostContainer 的創建移到 setTimeout 外部
+        const ghostContainer = document.createElement("div");
+        ghostContainer.className = "ghost-container";
+        ghostContainer.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: auto;
+          pointer-events: none;
+          z-index: 50;
+        `;
 
-    // 確保在組件掛載後等待一小段時間再初始化
-    const initTimer = setTimeout(() => {
-      const splitText = new SplitType(textElement, {
-        types: "lines,words",
-        tagName: "span",
-      });
+        // 添加 ghost container 到 DOM
+        heroRef.current.appendChild(ghostContainer);
+        ghostRef.current = ghostContainer;
 
-      splitTextRef.current = splitText;
+        // 確保在組件掛載後等待一小段時間再初始化
+        const initTimer = setTimeout(() => {
+          const splitText = new SplitType(textElement, {
+            types: "lines,words",
+            tagName: "span",
+          });
 
-      const ghostH1 = textElement.cloneNode(true);
-      ghostH1.classList.remove("split-text");
-      ghostH1.classList.add("ghost-text");
+          splitTextRef.current = splitText;
 
-      // 處理 ghost text
-      const processNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          const span = document.createElement("span");
-          span.textContent = node.textContent;
-          span.style.opacity = "0";
-          return span;
-        }
+          const ghostH1 = textElement.cloneNode(true);
+          ghostH1.classList.remove("split-text");
+          ghostH1.classList.add("ghost-text");
 
-        if (node.classList && node.classList.contains("keyword-highlight")) {
-          const clone = node.cloneNode(true);
-          clone.classList.remove("cursor-pointer");
-          clone.classList.add("ghost-highlight");
-          clone.style.opacity = "0";
-          clone.dataset.keyword = node.textContent.trim();
-          return clone;
-        }
+          // 處理 ghost text
+          const processNode = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              const span = document.createElement("span");
+              span.textContent = node.textContent;
+              span.style.opacity = "0";
+              return span;
+            }
 
-        const clone = node.cloneNode(false);
-        clone.style.opacity = "1";
-        Array.from(node.childNodes).forEach((child) => {
-          clone.appendChild(processNode(child));
-        });
-        return clone;
-      };
+            if (
+              node.classList &&
+              node.classList.contains("keyword-highlight")
+            ) {
+              const clone = node.cloneNode(true);
+              clone.classList.remove("cursor-pointer");
+              clone.classList.add("ghost-highlight");
+              clone.style.opacity = "0";
+              clone.dataset.keyword = node.textContent.trim();
+              return clone;
+            }
 
-      const processedH1 = processNode(ghostH1);
-      ghostContainer.appendChild(processedH1);
+            const clone = node.cloneNode(false);
+            clone.style.opacity = "1";
+            Array.from(node.childNodes).forEach((child) => {
+              clone.appendChild(processNode(child));
+            });
+            return clone;
+          };
 
-      // 修改滾動動畫的初始化
-      splitText.words.forEach((word) => {
-        word.style.opacity = 0.1;
-      });
+          const processedH1 = processNode(ghostH1);
+          ghostContainer.appendChild(processedH1);
 
-      const totalLines = splitText.lines.length;
-      const scrollPerLine = 1 / totalLines;
+          // 修改滾動動畫的初始化
+          splitText.words.forEach((word) => {
+            word.style.opacity = 0.1;
+          });
 
-      splitText.lines.forEach((line, index) => {
-        const words = line.querySelectorAll(".word");
-        const ghostWords = processedH1.querySelectorAll(".word");
+          const totalLines = splitText.lines.length;
+          const scrollPerLine = 1 / totalLines;
 
-        const trigger = ScrollTrigger.create({
-          trigger: heroRef.current,
+          splitText.lines.forEach((line, index) => {
+            const words = line.querySelectorAll(".word");
+            const ghostWords = processedH1.querySelectorAll(".word");
+
+            const trigger = ScrollTrigger.create({
+              trigger: heroRef.current,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: true,
+              immediateRender: false,
+              onUpdate: (self) => {
+                const progress = self.progress;
+                const lineStart = scrollPerLine * index;
+                const lineEnd = scrollPerLine * (index + 1);
+                const lineProgress = gsap.utils.clamp(
+                  0,
+                  1,
+                  (progress - lineStart) / (lineEnd - lineStart)
+                );
+
+                const wordsToShow = Math.floor(words.length * lineProgress);
+
+                words.forEach((word, wordIndex) => {
+                  if (word) {
+                    if (index === 0) {
+                      const firstLineProgress = gsap.utils.clamp(
+                        0,
+                        1,
+                        self.progress * 3
+                      );
+                      word.style.opacity =
+                        wordIndex < words.length * firstLineProgress ? 1 : 0.1;
+                    } else {
+                      word.style.opacity = wordIndex < wordsToShow ? 1 : 0.1;
+                    }
+                  }
+                  if (ghostWords[wordIndex]) {
+                    ghostWords[wordIndex].style.opacity =
+                      wordIndex < wordsToShow ? 1 : 0;
+                  }
+                });
+              },
+              onRefreshInit: () => {
+                updateGhostPosition();
+              },
+            });
+
+            scrollTriggersRef.current.push(trigger);
+          });
+
+          // 強制刷新
+          ScrollTrigger.refresh();
+
+          // 添加這個來確保初始狀態正確
+          ScrollTrigger.addEventListener("refresh", () => {
+            const progress = ScrollTrigger.getAll()[0]?.progress ?? 0;
+            if (
+              progress === 0 &&
+              splitTextRef.current &&
+              splitTextRef.current.lines
+            ) {
+              const firstLine = splitTextRef.current.lines[0];
+              if (firstLine) {
+                splitTextRef.current.words.forEach((word) => {
+                  if (firstLine.contains(word)) {
+                    word.style.opacity = 0.1;
+                  }
+                });
+              }
+            }
+          });
+        }, 1000); // 增加延遲時間
+
+        // 修改位置同步邏輯
+        const updateGhostPosition = () => {
+          if (!textElement || !ghostContainer || !heroRef.current) return;
+
+          const rect = textElement.getBoundingClientRect();
+          const heroRect = heroRef.current.getBoundingClientRect();
+
+          // 添加響應式判斷
+          const isDesktop = window.innerWidth >= 991;
+
+          // 如果是手機版，調整定位策略
+          if (!isDesktop) {
+            ghostContainer.style.position = "absolute";
+            ghostContainer.style.left = "0";
+            ghostContainer.style.maxWidth = "calc(100% - 32px)";
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+          } else {
+            // 桌面版原有邏輯
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+          }
+
+          // 只在 hero section 可見時更新位置
+          if (heroRect.top <= 0 && heroRect.bottom >= 0) {
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+            ghostContainer.style.opacity = "1";
+          } else {
+            ghostContainer.style.opacity = "0";
+          }
+        };
+
+        // 修改 ScrollTrigger 設置
+        const positionTrigger = ScrollTrigger.create({
+          trigger: heroRef.current, // 改為使用 hero section 作為觸發器
           start: "top top",
           end: "bottom bottom",
           scrub: true,
-          immediateRender: false,
-          onUpdate: (self) => {
-            const progress = self.progress;
-            const lineStart = scrollPerLine * index;
-            const lineEnd = scrollPerLine * (index + 1);
-            const lineProgress = gsap.utils.clamp(
-              0,
-              1,
-              (progress - lineStart) / (lineEnd - lineStart)
-            );
-
-            const wordsToShow = Math.floor(words.length * lineProgress);
-
-            words.forEach((word, wordIndex) => {
-              if (word) {
-                if (index === 0) {
-                  const firstLineProgress = gsap.utils.clamp(
-                    0,
-                    1,
-                    self.progress * 3
-                  );
-                  word.style.opacity =
-                    wordIndex < words.length * firstLineProgress ? 1 : 0.1;
-                } else {
-                  word.style.opacity = wordIndex < wordsToShow ? 1 : 0.1;
-                }
-              }
-              if (ghostWords[wordIndex]) {
-                ghostWords[wordIndex].style.opacity =
-                  wordIndex < wordsToShow ? 1 : 0;
-              }
-            });
-          },
-          onRefreshInit: () => {
-            updateGhostPosition();
-          },
+          onUpdate: updateGhostPosition,
+          // 添加 pin 功能，讓 ghost text 在離開 hero section 時停止
+          pin: false,
+          pinSpacing: false,
         });
 
-        scrollTriggersRef.current.push(trigger);
-      });
+        // 初始位置更新
+        updateGhostPosition();
 
-      // 強制刷新
-      ScrollTrigger.refresh();
+        // 添加 scroll 事件監聽，確保平滑更新
+        window.addEventListener("scroll", () => {
+          requestAnimationFrame(updateGhostPosition);
+        });
 
-      // 添加這個來確保初始狀態正確
-      ScrollTrigger.addEventListener("refresh", () => {
-        const progress = ScrollTrigger.getAll()[0]?.progress ?? 0;
-        if (
-          progress === 0 &&
-          splitTextRef.current &&
-          splitTextRef.current.lines
-        ) {
-          const firstLine = splitTextRef.current.lines[0];
-          if (firstLine) {
-            splitTextRef.current.words.forEach((word) => {
-              if (firstLine.contains(word)) {
-                word.style.opacity = 0.1;
-              }
-            });
+        // 清理函數
+        return () => {
+          clearTimeout(initTimer);
+          if (splitTextRef.current) {
+            splitTextRef.current.revert();
           }
-        }
-      });
-    }, 1000); // 增加延遲時間
+          scrollTriggersRef.current.forEach((trigger) => trigger.kill());
+          if (ghostRef.current) {
+            ghostRef.current.remove();
+          }
+        };
+      }, 1000);
 
-    // 修改位置同步邏輯
-    const updateGhostPosition = () => {
-      if (!textElement || !ghostContainer || !heroRef.current) return;
-
-      const rect = textElement.getBoundingClientRect();
-      const heroRect = heroRef.current.getBoundingClientRect();
-
-      // 添加響應式判斷
-      const isDesktop = window.innerWidth >= 991;
-
-      // 如果是手機版，調整定位策略
-      if (!isDesktop) {
-        ghostContainer.style.position = "absolute";
-        ghostContainer.style.left = "0";
-        ghostContainer.style.maxWidth = "calc(100% - 32px)";
-        ghostContainer.style.transform = `translateY(${
-          rect.top - heroRect.top
-        }px) translateX(${rect.left - heroRect.left}px)`;
-      } else {
-        // 桌面版原有邏輯
-        ghostContainer.style.transform = `translateY(${
-          rect.top - heroRect.top
-        }px) translateX(${rect.left - heroRect.left}px)`;
-      }
-
-      // 只在 hero section 可見時更新位置
-      if (heroRect.top <= 0 && heroRect.bottom >= 0) {
-        ghostContainer.style.transform = `translateY(${
-          rect.top - heroRect.top
-        }px) translateX(${rect.left - heroRect.left}px)`;
-        ghostContainer.style.opacity = "1";
-      } else {
-        ghostContainer.style.opacity = "0";
-      }
-    };
-
-    // 修改 ScrollTrigger 設置
-    const positionTrigger = ScrollTrigger.create({
-      trigger: heroRef.current, // 改為使用 hero section 作為觸發器
-      start: "top top",
-      end: "bottom bottom",
-      scrub: true,
-      onUpdate: updateGhostPosition,
-      // 添加 pin 功能，讓 ghost text 在離開 hero section 時停止
-      pin: false,
-      pinSpacing: false,
-    });
-
-    // 初始位置更新
-    updateGhostPosition();
-
-    // 添加 scroll 事件監聽，確保平滑更新
-    window.addEventListener("scroll", () => {
-      requestAnimationFrame(updateGhostPosition);
-    });
-
-    // 清理函數
-    return () => {
-      clearTimeout(initTimer);
-      if (splitTextRef.current) {
-        splitTextRef.current.revert();
-      }
-      scrollTriggersRef.current.forEach((trigger) => trigger.kill());
-      if (ghostRef.current) {
-        ghostRef.current.remove();
-      }
-    };
+      return () => {
+        clearTimeout(timer);
+        // 清理所有 ScrollTrigger 實例
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+        ScrollTrigger.clearMatchMedia();
+      };
+    }
   }, []);
 
   useEffect(() => {

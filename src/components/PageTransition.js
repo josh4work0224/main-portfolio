@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 
 const MosaicTransition = ({ children }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const isFirstMount = useRef(true);
   const router = useRouter();
   const mosaicRef = useRef(null);
   const gridSize = 12;
@@ -36,15 +37,14 @@ const MosaicTransition = ({ children }) => {
 
   useEffect(() => {
     const handleRouteChangeStart = (url) => {
-      // 安全地檢查 url
-      if (url && url !== router.asPath) {
+      if (url && url !== router.asPath && !isFirstMount.current) {
         setIsTransitioning(true);
         transitioningPathRef.current = url;
       }
+      isFirstMount.current = false;
     };
 
     const handleRouteChangeComplete = (url) => {
-      // 安全地檢查 url
       if (url && transitioningPathRef.current === url) {
         setIsTransitioning(false);
         transitioningPathRef.current = null;
@@ -53,7 +53,6 @@ const MosaicTransition = ({ children }) => {
 
     const handleRouteChangeError = (err, url) => {
       console.error("Route change error:", err);
-      // 重置狀態以防止卡住
       setIsTransitioning(false);
       transitioningPathRef.current = null;
     };
@@ -81,7 +80,6 @@ const MosaicTransition = ({ children }) => {
           from: "random",
         },
         onComplete: () => {
-          // 安全地推進路由
           if (transitioningPathRef.current) {
             router.push(transitioningPathRef.current).catch((err) => {
               console.error("Navigation error:", err);
@@ -112,18 +110,20 @@ const MosaicTransition = ({ children }) => {
   return (
     <div className="relative w-full h-full">
       {children}
-      <div
-        ref={mosaicRef}
-        className="fixed inset-0 z-[9999] pointer-events-none"
-        style={{
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-        }}
-      >
-        {createIrregularMosaicGrid()}
-      </div>
+      {!isFirstMount.current && (
+        <div
+          ref={mosaicRef}
+          className="fixed inset-0 z-[9999] pointer-events-none"
+          style={{
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+          }}
+        >
+          {createIrregularMosaicGrid()}
+        </div>
+      )}
     </div>
   );
 };
