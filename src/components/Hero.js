@@ -20,9 +20,9 @@ export default function Hero() {
   const [loadingMosaicTiles, setLoadingMosaicTiles] = useState([]);
 
   const keywords = {
-    WEBSITES: "/assets/websites.jpg",
-    "UI/UX": "/assets/uiux.jpg",
-    "LOW/NO CODE SOLUTIONS": "/assets/lowcode.jpg",
+    WEBSITES: "/assets/home-website.webp",
+    "UI/UX": "/assets/home-ui-ux.webp",
+    "LOW/NO CODE SOLUTIONS": "/assets/home-develope.webp",
   };
 
   // 移動鼠標事件處理到一個獨立的useEffect中

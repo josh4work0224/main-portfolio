@@ -28,7 +28,6 @@ export default function Home() {
         trigger: worksRef.current,
         start: "top 90%",
         end: "bottom top",
-        markers: true, // 開啟調試標記
         onEnter: () => setIsWorksVisible(true),
         onLeave: () => setIsWorksVisible(false),
         onEnterBack: () => setIsWorksVisible(true),
