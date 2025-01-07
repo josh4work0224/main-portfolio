@@ -141,7 +141,7 @@ export default function Archive() {
               </li>
               <li className="text-lime-300">
                 •Developed and upheld consistent visual branding for the
-                company's promotional materials.
+                company&apos;s promotional materials.
               </li>
             </ul>
           </div>
