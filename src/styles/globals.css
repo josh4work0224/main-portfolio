@@ -76,3 +76,19 @@ h6 {
   color: #adff2f;
   text-shadow: 0 0 10px #adff2f, 0 0 20px #adff2f, 0 0 30px #adff2f;
 }
+
+@keyframes blink {
+  0%,
+  100% {
+    box-shadow: 0 0 10px #adff2f, 0 0 10px #adff2f, 0 0 30px #adff2f;
+    opacity: 100%;
+  }
+  50% {
+    box-shadow: 0 0 5px #adff2f, 0 0 0px #adff2f, 0 0 0px #adff2f;
+    opacity: 75%;
+  }
+}
+
+.solid-blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
