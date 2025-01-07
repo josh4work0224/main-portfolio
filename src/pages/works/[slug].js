@@ -152,113 +152,104 @@ const WorkDetail = ({ work }) => {
     })) || [];
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger);
-    }
+    if (typeof window === "undefined") return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    console.log("ScrollTrigger registered");
 
     const initAnimation = () => {
+      // 清理所有現有的 ScrollTrigger 實例
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+      ScrollTrigger.clearMatchMedia();
+      ScrollTrigger.refresh(true);
+
       const overlay = document.querySelector("#hero-overlay");
       const heroProject = document.querySelector("#hero-space");
       const heroText = document.querySelector("#text-hero");
 
-      if (!overlay || !heroProject) {
-        setTimeout(initAnimation, 100);
-        return;
+      console.log("Attempting to find elements:", {
+        overlay: !!overlay,
+        heroProject: !!heroProject,
+        heroText: !!heroText,
+      });
+
+      if (!overlay || !heroProject || !heroText) {
+        console.log("Elements not found, retrying...");
+        return setTimeout(initAnimation, 100);
       }
 
-      // 先清理所有現有的 triggers
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      console.log("Elements found, creating ScrollTrigger");
 
-      // 重置 ScrollTrigger
-      ScrollTrigger.clearMatchMedia();
-      ScrollTrigger.refresh(true);
+      // 設置初始狀態
+      gsap.set(overlay, { opacity: 0.5, filter: "brightness(1)" });
+      gsap.set(heroText, { opacity: 1 });
 
-      // 等待一下再初始化新的動畫
-      const timer = setTimeout(() => {
-        // 創建主要的動畫 timeline
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: heroProject,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1,
-            immediateRender: false,
-            onEnter: () => {
-              if (overlay) {
-                gsap.to(overlay, {
-                  opacity: 0.85,
-                  filter: "brightness(0.2)",
-                  duration: 0.3,
-                  ease: "power2.inOut",
-                });
-              }
-              if (heroText) {
-                gsap.to(heroText, {
-                  opacity: 0,
-                  duration: 0.3,
-                  ease: "power2.inOut",
-                });
-              }
-            },
-            onLeaveBack: () => {
-              if (overlay) {
-                gsap.to(overlay, {
-                  opacity: 0.5,
-                  filter: "brightness(1)",
-                  duration: 0.3,
-                  ease: "power2.inOut",
-                });
-              }
-              if (heroText) {
-                gsap.to(heroText, {
-                  opacity: 1,
-                  duration: 0.3,
-                  ease: "power2.inOut",
-                });
-              }
-            },
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroProject,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+          onEnter: () => {
+            console.log("ScrollTrigger: Enter");
+            gsap.to(overlay, {
+              opacity: 0.85,
+              filter: "brightness(0.2)",
+              duration: 0.3,
+            });
+            gsap.to(heroText, {
+              opacity: 0,
+              duration: 0.3,
+            });
           },
-        });
-
-        // 設置初始狀態
-        gsap.set(overlay, {
-          opacity: 0.5,
-          filter: "brightness(1)",
-        });
-        gsap.set(heroText, {
-          opacity: 1,
-        });
-
-        return () => {
-          tl.kill();
-        };
-      }, 100);
+          onLeaveBack: () => {
+            console.log("ScrollTrigger: Leave Back");
+            gsap.to(overlay, {
+              opacity: 0.5,
+              filter: "brightness(1)",
+              duration: 0.3,
+            });
+            gsap.to(heroText, {
+              opacity: 1,
+              duration: 0.3,
+            });
+          },
+        },
+      });
 
       return () => {
-        clearTimeout(timer);
+        console.log("Cleaning up timeline");
+        tl.kill();
       };
     };
 
-    // 在路由變化完成後初始化動畫
-    const handleRouteChange = () => {
-      setTimeout(initAnimation, 100);
+    // 監聽頁面轉場完成事件
+    const handleTransitionComplete = () => {
+      console.log("Page transition complete, initializing ScrollTrigger");
+      initAnimation();
     };
 
-    router.events.on("routeChangeComplete", handleRouteChange);
+    // 添加事件監聽器
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
-    // 初始加載時也執行初始化
+    // 初始加載時也需要初始化
     if (document.readyState === "complete") {
       initAnimation();
     } else {
       window.addEventListener("load", initAnimation);
     }
 
+    // 清理函數
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
+      console.log("Component cleanup");
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
       window.removeEventListener("load", initAnimation);
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
-  }, [router]);
+  }, []); // 移除 router 依賴，因為我們現在使用事件來處理頁面變化
 
   if (!work) return <div>Loading...</div>;
   return (
@@ -422,7 +413,7 @@ const WorkDetail = ({ work }) => {
             </div>
           </div>
           <div className="lg:grid lg:grid-cols-8 flex flex-col gap-y-16 gap-x-8 lg:py-32 pb-32 pt-0">
-            <div className="col-span-3 col-start-1 flex flex-col self-end xl:order-1 order-2">
+            <div className="col-span-3 col-start-1 flex flex-col self-end lg:order-1 order-2">
               <span className="px-[2px] py-[1px] mb-4 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
                 Solutions
               </span>
@@ -432,7 +423,7 @@ const WorkDetail = ({ work }) => {
                   richTextOptions
                 )}
             </div>
-            <div className="w-full col-span-3 col-start-4 aspect-video overflow-hidden flex self-start xl:order-2 order-1 group">
+            <div className="w-full col-span-3 col-start-4 aspect-video overflow-hidden flex self-start lg:order-2 order-1 group">
               {work.fields.imageGallery?.[1]?.fields?.file?.url && (
                 <PixelatedImage
                   src={`https:${work.fields.imageGallery[1].fields.file.url}`}
@@ -502,7 +493,7 @@ const WorkDetail = ({ work }) => {
             </div>
           </div>
           <div className="lg:grid lg:grid-cols-8 flex flex-col gap-y-16 gap-x-8 lg:py-32 pb-32 pt-0">
-            <div className="col-span-3 col-start-3 flex flex-col self-end xl:order-1 order-2">
+            <div className="col-span-3 col-start-3 flex flex-col self-end lg:order-1 order-2">
               <span className="px-[2px] py-[1px] mb-4 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
                 Solutions
               </span>
@@ -512,7 +503,7 @@ const WorkDetail = ({ work }) => {
                   richTextOptions
                 )}
             </div>
-            <div className="w-full col-span-3 col-start-6 aspect-video overflow-hidden flex self-start xl:order-2 order-1 group">
+            <div className="w-full col-span-3 col-start-6 aspect-video overflow-hidden flex self-start lg:order-2 order-1 group">
               {work.fields.imageGallery?.[1]?.fields?.file?.url && (
                 <PixelatedImage
                   src={`https:${work.fields.imageGallery[1].fields.file.url}`}

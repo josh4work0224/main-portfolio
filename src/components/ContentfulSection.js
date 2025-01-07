@@ -75,11 +75,13 @@ const ContentfulSection = () => {
             );
           },
           onLeaveBack: () => {
-            gsap.to([textElement, dividerElement, animateElement], {
+            gsap.to(textElement, {
               opacity: 0,
               duration: 0.5,
               ease: "power1.in",
             });
+            gsap.to(dividerElement, { scaleX: 0 });
+            gsap.to(animateElement, { scale: 0 });
           },
           invalidateOnRefresh: true,
         });

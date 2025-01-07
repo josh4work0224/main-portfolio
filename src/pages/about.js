@@ -81,48 +81,97 @@ export default function Archive() {
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px] lg:justify-self-start">
             Experiences
           </span>
-          <div className="flex flex-col lg:col-span-3 lg:col-start-1 p-4 border relative bg-slate-100/10 border-gray-500">
+          <div
+            className="flex flex-col lg:col-span-3 lg:col-start-1 p-4 border relative bg-slate-100/10 border-gray-500"
+            style={{
+              backgroundImage: "url('./assets/tenten_logo.svg')",
+              backgroundSize: "auto 100%",
+              backgroundPosition: "top right",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <h2 className="text-4xl font-semibold">
+              UI/UX designer & Low/no-code developer
+            </h2>
             <div className="flex flex-row gap-4 items-end">
-              <h2 className="text-4xl">tenten.co</h2>
-              <h3 className="text-2xl">2022-present</h3>
+              <h3 className="text-xl">tenten.co</h3>
+              <h3 className="text-xl">2022-present</h3>
             </div>
-            <h3 className="text-xl">
-              <span className="text-lime-300">[</span>UI/UX designer
-              <span className="text-lime-300">]</span>,
-              <span className="text-lime-300">[</span>Low/no-code developer
-              <span className="text-lime-300">]</span>
-            </h3>
             <ul className="text-md">
               <li className="text-lime-300">
-                •Independently design and build responsive, user-friendly
-                websites, including corporate sites and e-commerce platforms,
-                using low/no-code tools such as Webflow and Shopify.
+                •Design and build responsive websites using low/no-code tools
+                like Webflow and Shopify, tailored to client goals.
+              </li>
+              <li className="text-lime-300">
+                •Streamline processes with automation tools such as Make.com and
+                Zapier.
+              </li>
+              <li className="text-lime-300">
+                •Create engaging motion graphics and visual assets for marketing
+                and branding.
               </li>
               <li className="text-lime-300">
                 •Collaborate with clients to understand their business needs and
                 goals, and provide tailored solutions.
               </li>
               <li className="text-lime-300">
-                •Utilize automation tools like Make.com and Zapier to streamline
-                business processes and improve efficiency.
-              </li>
-              <li className="text-lime-300">
-                •Create visually compelling motion graphics and high-quality
-                graphic assets for marketing campaigns, digital platforms, and
-                branding materials.
-              </li>
-              <li className="text-lime-300">
-                Collaborate with internal teams to conceptualize and develop
-                digital products tailored to the company’s objectives.
+                •Collaborate on developing digital products that align with
+                business objectives.
               </li>
             </ul>
-            <Image
-              src="/assets/tenten_logo.svg"
-              className="absolute right-0 h-[40%] max-w-[50%] object-cover top-0 bottom-0"
-              alt="Logo"
-              width={450}
-              height={450}
-            />
+          </div>
+          <div
+            className="flex flex-col lg:col-span-3 lg:col-start-3 p-4 border relative bg-slate-100/10 border-gray-500"
+            style={{
+              backgroundImage: "url('./assets/tenten_logo-1.svg')",
+              backgroundSize: "auto 100%",
+              backgroundPosition: "top right",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <h2 className="text-4xl font-semibold">Product Designer</h2>
+            <div className="flex flex-row gap-4 items-end">
+              <h3 className="text-xl">Netigate</h3>
+              <h3 className="text-xl">2021-2022</h3>
+            </div>
+            <ul className="text-md">
+              <li className="text-lime-300">
+                •Designed and maintained industrial IoT products, focusing on
+                usability and user-centered design principles.
+              </li>
+              <li className="text-lime-300">
+                •Developed and upheld consistent visual branding for the
+                company's promotional materials.
+              </li>
+            </ul>
+          </div>
+          <div
+            className="flex flex-col lg:col-span-3 lg:col-start-5 p-4 border relative bg-slate-100/10 border-gray-500"
+            style={{
+              backgroundImage: "url('./assets/domus_logo.svg')",
+              backgroundSize: "auto 100%",
+              backgroundPosition: "top right",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <h2 className="text-4xl font-semibold">
+              Master in Interaction Design
+            </h2>
+            <div className="flex flex-row gap-4 items-end">
+              <h3 className="text-xl">Domus Academy</h3>
+              <h3 className="text-xl">2020-2021</h3>
+            </div>
+            <ul className="text-md">
+              <li className="text-lime-300">
+                •Awarded a scholarship for academic excellence; created projects
+                including interactive installations and apps.
+              </li>
+              <li className="text-lime-300">
+                •Led end-to-end design processes, from UX research to UI/UX
+                design, prototyping, and presentations evaluated by industry
+                professionals.
+              </li>
+            </ul>
           </div>
         </div>
       </main>

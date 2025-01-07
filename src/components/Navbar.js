@@ -61,14 +61,14 @@ export default function Navbar() {
 
   return (
     <nav className="w-full fixed top-0 left-0 row-start-1 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2">
-      <span className="text-xl font-display xl:order-1 order-2">
+      <span className="text-xl font-display lg:order-1 order-2">
         <Link href="/" scroll={false}>
           <strong>SHENGCHI</strong> H.
         </Link>
       </span>
 
       <Link
-        className="flex-1 flex lg:justify-center justify-start xl:order-2 order-1"
+        className="flex-1 flex lg:justify-center justify-start lg:order-2 order-1"
         href="/"
         scroll={false}
       >

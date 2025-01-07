@@ -38,8 +38,8 @@ export default function Transition({ children }) {
   };
 
   const createMosaicTiles = () => {
-    const gridRows = 10;
-    const gridCols = 20;
+    const gridRows = 15;
+    const gridCols = 30;
     const blockWidth = 100 / gridCols;
     const blockHeight = 100 / gridRows;
 
@@ -104,7 +104,7 @@ export default function Transition({ children }) {
           stagger: {
             each: 0.02,
             from: "start",
-            grid: [10, 20],
+            grid: [15, 30],
             axis: "x",
             amount: 0.5,
           },
@@ -128,11 +128,11 @@ export default function Transition({ children }) {
               setShowLogo(false);
               gsap.to(tiles, {
                 opacity: 0,
-                duration: 0.3,
+                duration: 0.1,
                 stagger: {
                   each: 0.02,
                   from: "end",
-                  grid: [10, 20],
+                  grid: [15, 30],
                   axis: "x",
                   amount: 0.5,
                 },
@@ -157,6 +157,29 @@ export default function Transition({ children }) {
       setDisplayChildren(children);
     }
   }, [children, router.asPath]);
+
+  useEffect(() => {
+    if (showLogo && clientLogo) {
+      const logo = document.querySelector(".client-logo");
+      if (logo) {
+        gsap.fromTo(
+          logo,
+          {
+            opacity: 0,
+            scale: 0.75,
+            transform: "translateY(20px)",
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.7,
+            ease: "power2.out",
+            transform: "translateY(0)",
+          }
+        );
+      }
+    }
+  }, [showLogo, clientLogo]);
 
   return (
     <div className="relative w-full min-h-screen">
@@ -204,7 +227,7 @@ export default function Transition({ children }) {
                 alt={clientLogo.fields.title || "Client Logo"}
                 width={400}
                 height={400}
-                className="object-contain filter invert brightness-0 aspect-square lg:w-[20rem] w-[40%]"
+                className="client-logo object-contain filter invert brightness-0 aspect-square lg:w-[20rem] w-[40%] opacity-0"
               />
             </div>
           )}
