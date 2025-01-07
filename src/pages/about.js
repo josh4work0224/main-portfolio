@@ -123,7 +123,7 @@ export default function Archive() {
           <div
             className="flex flex-col lg:col-span-3 lg:col-start-3 p-4 border relative bg-slate-100/10 border-gray-500"
             style={{
-              backgroundImage: "url('./assets/tenten_logo-1.svg')",
+              backgroundImage: "url('./assets/net_logo.svg')",
               backgroundSize: "auto 100%",
               backgroundPosition: "top right",
               backgroundRepeat: "no-repeat",

@@ -24,17 +24,17 @@ export function LenisProvider({ children }) {
   };
 
   const initLenis = () => {
+    // 確保先清理現有實例
     destroyLenis();
 
-    // 重置所有滾動相關樣式
-    document.body.style.height = "";
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    document.documentElement.style.height = "";
+    // 移除這些樣式重置，讓頁面自然展開
+    // document.body.style.height = "";
+    // document.body.style.overflow = "";
+    // document.documentElement.style.overflow = "";
+    // document.documentElement.style.height = "";
 
-    // 使用 setTimeout 確保 DOM 已完全更新
+    // 增加延遲時間，確保 DOM 完全準備好
     setTimeout(() => {
-      // 初始化 Lenis
       lenisRef.current = new Lenis({
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -59,8 +59,9 @@ export function LenisProvider({ children }) {
       }
       requestAnimationFrame(raf);
 
+      // 強制更新 ScrollTrigger
       ScrollTrigger.refresh(true);
-    }, 100);
+    }, 500); // 增加延遲時間到 500ms
   };
 
   useEffect(() => {
@@ -78,12 +79,20 @@ export function LenisProvider({ children }) {
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      // 首次加載等待 DOM 完全準備好
-      if (document.readyState === "complete") {
-        initLenis();
-      } else {
-        window.addEventListener("load", initLenis);
-      }
+
+      // 修改首次載入的初始化邏輯
+      const initialLoad = () => {
+        // 確保 DOM 完全載入後再初始化
+        if (document.readyState === "complete") {
+          setTimeout(initLenis, 100);
+        } else {
+          window.addEventListener("load", () => setTimeout(initLenis, 100), {
+            once: true,
+          });
+        }
+      };
+
+      initialLoad();
     }
 
     router.events.on("routeChangeStart", handleRouteChangeStart);
