@@ -24,7 +24,7 @@ export default function Archive() {
           </p>
         </div>
         <Image
-          src="/assets/hero-bg.jpg"
+          src="/assets/personal-img.webp"
           alt="background"
           width={1920}
           height={1080}
