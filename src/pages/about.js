@@ -16,7 +16,7 @@ export default function Archive() {
             creative developer based in Taiwan, passionate about crafting
             meaningful digital experiences.
           </h1>
-          <p className="text-md mt-2">
+          <p className="text-lg mt-2">
             With a strong foundation in design and no/low-code development, I
             specialize in blending aesthetics with functionality to create
             visually stunning and user-friendly websites. My work focuses on
@@ -40,42 +40,42 @@ export default function Archive() {
           </span>
           <div className="flex flex-col lg:col-span-3 lg:col-start-1">
             <h2 className="text-4xl">User-Centered Design</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Blending design and development to create beautiful, functional
               digital experiences.
             </p>
           </div>
           <div className="flex flex-col lg:col-span-3 lg:col-start-4">
             <h2 className="text-4xl">Webflow Development</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Designing and building responsive, user-friendly websites using
               Webflow’s no-code platform.
             </p>
           </div>
           <div className="flex flex-col lg:col-span-3 lg:col-start-1">
             <h2 className="text-4xl">Shopify Solutions</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Creating customized e-commerce stores that are both functional and
               visually appealing.
             </p>
           </div>
           <div className="flex flex-col lg:col-span-3 lg:col-start-4">
             <h2 className="text-4xl">Workflow Automation</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Using tools like Make.com and Zapier to simplify processes and
               create efficient systems.
             </p>
           </div>
           <div className="flex flex-col lg:col-span-3 lg:col-start-1">
             <h2 className="text-4xl">Creative Animations</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Developing interactive animations with Spline, Rive, and Lottie to
               bring creative ideas to life.
             </p>
           </div>
           <div className="flex flex-col lg:col-span-3 lg:col-start-4">
             <h2 className="text-4xl">Professional Video Editing</h2>
-            <p className="text-md mt-2">
+            <p className="text-lg mt-2">
               Producing polished videos to enhance storytelling and brand
               presence.
             </p>
@@ -101,7 +101,7 @@ export default function Archive() {
               <h3 className="text-xl">tenten.co</h3>
               <h3 className="text-xl">2022-present</h3>
             </div>
-            <ul className="text-md list-[square] ml-4 leading-tight">
+            <ul className="text-lg list-[square] ml-4 leading-tight">
               <li  className="mb-1">
                 Design and develop responsive websites with Webflow and Shopify, incorporating motion graphics for engaging user experiences.
               </li>
@@ -127,7 +127,7 @@ export default function Archive() {
               <h3 className="text-xl">Netigate</h3>
               <h3 className="text-xl">2021-2022</h3>
             </div>
-            <ul className="text-md list-[square] ml-4 leading-tight">
+            <ul className="text-lg list-[square] ml-4 leading-tight">
               <li className="mb-1">
                 Designed and maintained industrial IoT products, focusing on
                 usability and user-centered design principles.
@@ -154,7 +154,7 @@ export default function Archive() {
               <h3 className="text-xl">Domus Academy</h3>
               <h3 className="text-xl">2020-2021</h3>
             </div>
-            <ul className="text-md list-[square] ml-4 leading-tight">
+            <ul className="text-lg list-[square] ml-4 leading-tight">
               <li className="mb-1">
                 Awarded a scholarship for academic excellence; created projects
                 including interactive installations and apps.

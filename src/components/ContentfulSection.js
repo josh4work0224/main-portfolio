@@ -224,7 +224,7 @@ const ContentfulSection = () => {
                     <span className="text-lime-300">[ </span>
                     {work.fields.name} <span className="text-lime-300"> ]</span>
                   </span>
-                  <span className="lg:block hidden text-md text-white mb-2 w-[60%] font-thin leading-tight">
+                  <span className="lg:block hidden text-lg text-white mb-2 w-[60%] font-thin leading-tight">
                     {work.fields.overview}
                   </span>
                 </div>

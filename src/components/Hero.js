@@ -675,7 +675,7 @@ export default function Hero() {
           </h1>
           <div className="flex flex-row gap-4 items-center">
             <div className="solid-blink w-4 h-4 bg-lime-300 shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_10px_#adff2f]"></div>
-            <p className="text-md">Based in Taipei</p>
+            <p className="text-lg">Based in Taipei</p>
           </div>
         </div>
       </div>
