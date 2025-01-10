@@ -98,57 +98,81 @@ export default function Transition({ children }) {
         setMosaicTiles(tiles);
 
         // 進場動畫
-        gsap.to(tiles, {
-          opacity: 1,
-          duration: 0.3,
-          stagger: {
-            each: 0.02,
-            from: "start",
-            grid: [15, 30],
-            axis: "x",
-            amount: 0.5,
-          },
-          ease: "power2.inOut",
-          onUpdate: () => {
-            setMosaicTiles([...tiles]);
-          },
-          onComplete: () => {
-            if (shouldShowLogo(router.asPath)) {
-              setTimeout(() => {
-                setShowLogo(true);
-              }, 300);
+        await new Promise((resolve) => {
+          gsap.to(tiles, {
+            opacity: 1,
+            duration: 0.2,
+            stagger: {
+              each: 0.02,
+              from: "start",
+              grid: [15, 30],
+              axis: "x",
+              amount: 0.5,
+            },
+            ease: "none",
+            onUpdate: () => {
+              setMosaicTiles([...tiles]);
+            },
+            onComplete: resolve,
+          });
+        });
+
+        // 添加 0.5 秒延遲
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // 等待新頁面內容加載完成
+        await new Promise((resolve) => {
+          setDisplayChildren(children);
+
+          // 監聽頁面加載完成事件
+          const checkPageLoaded = () => {
+            const images = document.querySelectorAll("img");
+            const allImagesLoaded = Array.from(images).every(
+              (img) => img.complete
+            );
+
+            if (allImagesLoaded) {
+              resolve();
+            } else {
+              setTimeout(checkPageLoaded, 100);
             }
+          };
 
-            // 新頁面切換
-            setTimeout(() => {
-              setDisplayChildren(children);
-              window.scrollTo(0, 0);
+          checkPageLoaded();
+        });
 
-              // 退場動畫
-              setShowLogo(false);
-              gsap.to(tiles, {
-                opacity: 0,
-                duration: 0.1,
-                stagger: {
-                  each: 0.02,
-                  from: "end",
-                  grid: [15, 30],
-                  axis: "x",
-                  amount: 0.5,
-                },
-                ease: "power2.inOut",
-                onUpdate: () => {
-                  setMosaicTiles([...tiles]);
-                },
-                onComplete: () => {
-                  setTimeout(() => {
-                    // 觸發自定義事件通知轉場完成
-                    window.dispatchEvent(new Event("pageTransitionComplete"));
-                  }, 100);
-                },
-              });
-            }, 1000);
-          },
+        // Logo 顯示動畫
+        if (shouldShowLogo(router.asPath)) {
+          setShowLogo(true);
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Logo 動畫時間
+        }
+
+        // 退場動畫
+        window.scrollTo(0, 0);
+        setShowLogo(false);
+
+        await new Promise((resolve) => {
+          gsap.to(tiles, {
+            opacity: 0,
+            duration: 0.1,
+            stagger: {
+              each: 0.02,
+              from: "end",
+              grid: [15, 30],
+              axis: "x",
+              amount: 0.5,
+            },
+            ease: "none",
+            onUpdate: () => {
+              setMosaicTiles([...tiles]);
+            },
+            onComplete: () => {
+              setTimeout(() => {
+                window.dispatchEvent(new Event("pageTransitionComplete"));
+                resolve();
+              }, 100);
+            },
+          });
         });
       };
 
