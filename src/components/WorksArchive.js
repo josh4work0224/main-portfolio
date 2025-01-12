@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { createClient } from 'contentful';
-import Link from 'next/link';
-import Image from 'next/image';
+import React, { useEffect, useState } from "react";
+import { createClient } from "contentful";
+import Link from "next/link";
+import Image from "next/image";
+import Footer from "./Footer";
 
 const WorksArchive = () => {
   const [works, setWorks] = useState([]);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID || !process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN) {
-      console.error('環境變數未正確設置');
+    if (
+      !process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID ||
+      !process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN
+    ) {
+      console.error("環境變數未正確設置");
       return;
     }
 
@@ -19,12 +23,12 @@ const WorksArchive = () => {
 
     client
       .getEntries({
-        content_type: 'works',
+        content_type: "works",
         include: 2,
       })
       .then((response) => {
         // 添加 console.log 來檢查數據結構
-        console.log('API Response:', response.items[0]?.fields);
+        console.log("API Response:", response.items[0]?.fields);
 
         const worksWithSlugs = response.items.map((item) => ({
           ...item,
@@ -48,13 +52,17 @@ const WorksArchive = () => {
     <section className="mt-[8rem] relative z-[95] bg-black w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {works.map((work) => (
-          <Link href={`/works/${work.fields.slug}`} key={work.sys.id} className="block">
+          <Link
+            href={`/works/${work.fields.slug}`}
+            key={work.sys.id}
+            className="block"
+          >
             <div className="block group">
               <div className="overflow-hidden relative w-full h-72">
                 {work.fields.mainImage?.fields?.file?.url && (
                   <Image
                     src={`https:${work.fields.mainImage.fields.file.url}`}
-                    alt={work.fields.name || 'Work image'}
+                    alt={work.fields.name || "Work image"}
                     fill
                     className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                   />
@@ -64,21 +72,26 @@ const WorksArchive = () => {
                     work.fields.type.map((categoryRef) => (
                       <span
                         key={categoryRef.sys.id}
-                        className="px-2 py-1 bg-gray-800 text-white text-sm"
+                        className="px-[2px] py-[1px] font-thin bg-white text-slate-700 text-lg leading-none uppercase rounded-[2px]"
                       >
-                        {categoryRef.fields?.tagName || 'Unnamed Category'}
+                        {categoryRef.fields?.tagName || "Unnamed Category"}
                       </span>
                     ))}
                 </div>
               </div>
               <div className="py-2">
-                <span className="py-2 text-white text-sm">{work.fields.client}</span>
-                <h3 className="text-xl font-semibold text-white mb-2">{work.fields.name}</h3>
+                <span className="py-2 text-white text-sm">
+                  {work.fields.client}
+                </span>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {work.fields.name}
+                </h3>
               </div>
             </div>
           </Link>
         ))}
       </div>
+      <Footer />
     </section>
   );
 };

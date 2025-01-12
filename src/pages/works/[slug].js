@@ -260,14 +260,15 @@ const WorkDetail = ({ work }) => {
           id="hero-overlay"
         ></div>
         {work.fields.mainImage?.fields?.file?.url && (
-          <div
-            className="absolute mb-8 bg-cover bg-center col-span-3 h-full transition-all duration-500 z-10"
-            style={{
-              backgroundImage: `url(https:${work.fields.mainImage.fields.file.url})`,
-              width: "100%",
-              height: "100vh",
-            }}
-          ></div>
+          <div className="absolute w-full h-full z-10">
+            <PixelatedImage
+              src={`https:${work.fields.mainImage.fields.file.url}`}
+              alt={work.fields.mainImage.fields.file.title || "Hero image"}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
         )}
         <div className="relative md:px-8 px-4 z-20">
           <div
