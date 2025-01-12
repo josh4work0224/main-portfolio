@@ -22,7 +22,7 @@ export default function Hero() {
   const keywords = {
     WEBSITES: "/assets/home-website.webp",
     "UI/UX": "/assets/home-ui-ux.webp",
-    "LOW/NO CODE SOLUTIONS": "/assets/home-develope.webp",
+    "LOW CODE SOLUTIONS": "/assets/home-develope.webp",
   };
 
   // 移動鼠標事件處理到一個獨立的useEffect中
@@ -656,20 +656,20 @@ export default function Hero() {
             <br />
             <span
               className={`keyword-highlight cursor-pointer text-[#adff2f] transition-opacity duration-300 ease-out ${
-                hoveredKeyword === "LOW/NO CODE SOLUTIONS"
+                hoveredKeyword === "LOW CODE SOLUTIONS"
                   ? "text-shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_30px_#adff2f]"
                   : ""
               } lg:hover:text-shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_30px_#adff2f]`}
-              onClick={() => handleKeywordClick("LOW/NO CODE SOLUTIONS")}
+              onClick={() => handleKeywordClick("LOW CODE SOLUTIONS")}
               onMouseEnter={() =>
                 window.innerWidth >= 1024 &&
-                handleMouseEnter("LOW/NO CODE SOLUTIONS")
+                handleMouseEnter("LOW CODE SOLUTIONS")
               }
               onMouseLeave={() =>
                 window.innerWidth >= 1024 && handleMouseLeave()
               }
             >
-              LOW/NO CODE SOLUTIONS
+              LOW CODE SOLUTIONS
             </span>
             .
           </h1>
