@@ -224,7 +224,7 @@ const ContentfulSection = () => {
                     work.fields.type.map((categoryRef) => (
                       <div
                         key={categoryRef.sys.id}
-                        className="text-md px-1 mr-2 text-slate-600 uppercase bg-white leading-tight font-semibold"
+                        className="text-md font-thin px-1 mr-2 text-slate-600 uppercase bg-white leading-tight"
                       >
                         <h4>
                           {categoryRef.fields?.tagName || "Unnamed Category"}

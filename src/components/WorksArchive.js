@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "contentful";
 import Link from "next/link";
 import Image from "next/image";
-import Footer from "./Footer";
 
 const WorksArchive = () => {
   const [works, setWorks] = useState([]);
+  const [selectedType, setSelectedType] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
+  const [allTypes, setAllTypes] = useState([]);
 
   useEffect(() => {
     if (
@@ -27,7 +29,6 @@ const WorksArchive = () => {
         include: 2,
       })
       .then((response) => {
-        // 添加 console.log 來檢查數據結構
         console.log("API Response:", response.items[0]?.fields);
 
         const worksWithSlugs = response.items.map((item) => ({
@@ -35,7 +36,6 @@ const WorksArchive = () => {
           fields: {
             ...item.fields,
             slug: item.fields.slug || item.sys.id,
-            // 確保 category 是一個陣列且為 Reference 類型
             category: Array.isArray(item.fields.category)
               ? item.fields.category
               : item.fields.category
@@ -44,54 +44,107 @@ const WorksArchive = () => {
           },
         }));
         setWorks(worksWithSlugs);
+        
+        const types = new Set();
+        worksWithSlugs.forEach(work => {
+          work.fields.type?.forEach(type => {
+            types.add(type.fields?.tagName);
+          });
+        });
+        setAllTypes(['all', ...Array.from(types)]);
       })
       .catch(console.error);
   }, []);
 
+  const filteredAndSortedWorks = works
+    .filter(work => {
+      if (selectedType === 'all') return true;
+      return work.fields.type?.some(type => type.fields?.tagName === selectedType);
+    })
+    .sort((a, b) => {
+      if (sortOrder === 'newest') {
+        return new Date(b.sys.createdAt) - new Date(a.sys.createdAt);
+      } else {
+        return new Date(a.sys.createdAt) - new Date(b.sys.createdAt);
+      }
+    });
+
   return (
     <section className="mt-[8rem] relative z-[95] bg-black w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {works.map((work) => (
+      <div className="mb-8 flex flex-wrap gap-4 items-center">
+        <div className="flex gap-2">
+          {allTypes.map(type => (
+            <button
+              key={type}
+              onClick={() => setSelectedType(type)}
+              className={`px-4 py-2 rounded ${
+                selectedType === type 
+                  ? 'bg-white text-black' 
+                  : 'bg-gray-800 text-white'
+              }`}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="bg-gray-800 text-white px-4 py-2 rounded"
+        >
+          <option value="newest">最新順序</option>
+          <option value="oldest">最舊順序</option>
+        </select>
+      </div>
+
+      <div className="w-full mx-auto">
+        {filteredAndSortedWorks.map((work) => (
           <Link
             href={`/works/${work.fields.slug}`}
             key={work.sys.id}
-            className="block"
+            className="block group"
           >
-            <div className="block group">
-              <div className="overflow-hidden relative w-full h-72">
-                {work.fields.mainImage?.fields?.file?.url && (
-                  <Image
-                    src={`https:${work.fields.mainImage.fields.file.url}`}
-                    alt={work.fields.name || "Work image"}
-                    fill
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                  />
-                )}
-                <div className="absolute bottom-2 left-2 flex flex-wrap gap-2">
+            <div className="flex flex-col lg:flex-row justify-between items-start py-8 border-b border-gray-800 hover:bg-gray-900/30 transition-all duration-300 gap-6">
+              <div className="space-y-4 flex-1">
+                <h3 className="text-5xl font-light text-white group-hover:translate-x-2 transition-transform duration-300">
+                  {work.fields.client}
+                </h3>
+                <div className="flex flex-wrap gap-2">
                   {Array.isArray(work.fields.type) &&
                     work.fields.type.map((categoryRef) => (
                       <span
                         key={categoryRef.sys.id}
-                        className="px-[2px] py-[1px] font-thin bg-white text-slate-700 text-lg leading-none uppercase rounded-[2px]"
+                        className="text-md font-thin px-1 mr-2 text-slate-600 uppercase bg-white leading-tight"
                       >
                         {categoryRef.fields?.tagName || "Unnamed Category"}
                       </span>
                     ))}
                 </div>
               </div>
-              <div className="py-2">
-                <span className="py-2 text-white text-sm">
-                  {work.fields.client}
+
+              <div className="flex flex-col items-end gap-4">
+                {work.fields.animate?.fields?.file?.url && (
+                  <div className="relative h-[5rem] aspect-square overflow-hidden rounded-lg">
+                    <Image
+                      src={`https:${work.fields.animate.fields.file.url}`}
+                      alt={work.fields.animate.fields.file.title || "Animation"}
+                      fill
+                      className="object-cover"
+                      style={{
+                        animationPlayState: "var(--animation-play-state, running)"
+                      }}
+                    />
+                  </div>
+                )}
+                <span className="inline-block text-white text-lg font-light opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                  View Project
+                  <span className="ml-2">→</span>
                 </span>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  {work.fields.name}
-                </h3>
               </div>
             </div>
           </Link>
         ))}
       </div>
-      <Footer />
     </section>
   );
 };

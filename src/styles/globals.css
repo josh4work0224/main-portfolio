@@ -92,3 +92,22 @@ h6 {
 .solid-blink {
   animation: blink 1.5s ease-in-out infinite;
 }
+
+@media (min-width: 1024px) {
+  /* lg 尺寸以上時，預設暫停動畫 */
+  .group img {
+    --animation-play-state: paused;
+  }
+
+  /* hover 時播放動畫 */
+  .group:hover img {
+    --animation-play-state: running;
+  }
+}
+
+@media (max-width: 1023px) {
+  /* lg 尺寸以下時，一直播放動畫 */
+  .group img {
+    --animation-play-state: running;
+  }
+}
