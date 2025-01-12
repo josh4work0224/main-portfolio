@@ -90,7 +90,7 @@ function PixelatedImage({
         const image = new Image();
         image.crossOrigin = "anonymous";
 
-        if (!src.startsWith("http")) {
+        if (src.startsWith("//")) {
           image.src = `https:${src}`;
         } else {
           image.src = src;

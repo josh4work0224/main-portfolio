@@ -41,20 +41,31 @@ export default function Home() {
 
   // 路由變化時的處理
   useEffect(() => {
-    const handleRouteChangeStart = () => {
-      console.log("Route change started");
-      setIsWorksVisible(false); // 重置狀態
-      // 不要在這裡清理 ScrollTrigger
+    const handleRouteChangeStart = (url) => {
+      console.log("Route change started to:", url);
+      // 只有當不是導向首頁時才重置狀態
+      if (url !== "/") {
+        setIsWorksVisible(false);
+      }
     };
 
-    const handleRouteChangeComplete = () => {
-      console.log("Route change completed");
-      // 移除這裡的立即重置
+    const handleRouteChangeComplete = (url) => {
+      console.log("Route change completed to:", url);
+      // 如果是導向首頁，手動觸發重新初始化
+      if (url === "/") {
+        console.log("Navigated to home - reinitializing animations");
+        setTimeout(() => {
+          setPageKey(prev => prev + 1);
+          initializeScrollTrigger();
+          // 觸發自定義事件來重新初始化其他組件
+          window.dispatchEvent(new Event("homeNavigationComplete"));
+        }, 100);
+      }
     };
 
     const handleTransitionComplete = () => {
       console.log("Transition complete - reinitializing animations");
-      setPageKey((prev) => prev + 1);
+      setPageKey(prev => prev + 1);
       setTimeout(() => {
         initializeScrollTrigger();
       }, 100);

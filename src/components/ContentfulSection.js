@@ -159,6 +159,22 @@ const ContentfulSection = () => {
       .catch(console.error);
   }, []);
 
+  useEffect(() => {
+    const handleHomeNavigation = () => {
+      console.log("Home navigation detected - reinitializing ContentfulSection animations");
+      setRemountKey(prev => prev + 1);
+      setTimeout(() => {
+        initializeAnimations();
+      }, 100);
+    };
+
+    window.addEventListener("homeNavigationComplete", handleHomeNavigation);
+
+    return () => {
+      window.removeEventListener("homeNavigationComplete", handleHomeNavigation);
+    };
+  }, []);
+
   return (
     <div key={remountKey} className="flex flex-col gap-16 relative">
       {works.map((work, index) => (

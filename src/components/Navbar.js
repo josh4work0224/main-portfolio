@@ -60,15 +60,15 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <nav className="w-full fixed top-0 left-0 row-start-1 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2">
-      <span className="text-xl font-display lg:order-1 order-2">
+    <nav className="w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2">
+      <span className="text-xl font-display lg:order-1 order-2 lg:col-span-1">
         <Link href="/" scroll={false}>
           <strong>SHENGCHI</strong> H.
         </Link>
       </span>
 
       <Link
-        className="flex-1 flex lg:justify-center justify-start lg:order-2 order-1"
+        className="flex-1 flex lg:justify-center justify-start lg:order-2 order-1 lg:col-span-1"
         href="/"
         scroll={false}
       >
@@ -105,7 +105,7 @@ export default function Navbar() {
       </button>
 
       {/* Desktop menu */}
-      <div className="hidden lg:flex gap-6 order-3">
+      <div className="hidden lg:flex gap-6 order-3 lg:col-span-1 lg:justify-end">
         <Link href="/archive" className="hover:text-gray-300" scroll={false}>
           Works Archive
         </Link>

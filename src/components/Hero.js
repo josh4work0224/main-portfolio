@@ -516,6 +516,24 @@ export default function Hero() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleHomeNavigation = () => {
+      console.log("Home navigation detected - reinitializing Hero animations");
+      // 重新初始化 Hero 組件的動畫
+      if (typeof window !== "undefined") {
+        gsap.registerPlugin(ScrollTrigger);
+        // 重新初始化您的動畫邏輯
+        // ...
+      }
+    };
+
+    window.addEventListener("homeNavigationComplete", handleHomeNavigation);
+
+    return () => {
+      window.removeEventListener("homeNavigationComplete", handleHomeNavigation);
+    };
+  }, []);
+
   return (
     <section
       ref={heroRef}
