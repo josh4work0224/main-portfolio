@@ -105,18 +105,16 @@ const ContentfulSection = () => {
   useEffect(() => {
     const handleTransitionComplete = () => {
       console.log("Page transition complete - reinitializing animations");
-      setRemountKey((prev) => prev + 1);
-      initializeAnimations();
+      setTimeout(() => {
+        setRemountKey((prev) => prev + 1);
+        initializeAnimations();
+      }, 100);
     };
 
     window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
-      window.removeEventListener(
-        "pageTransitionComplete",
-        handleTransitionComplete
-      );
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
     };
   }, []);
 

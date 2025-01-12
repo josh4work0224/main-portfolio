@@ -1,11 +1,21 @@
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
+import PixelatedImage from "@/components/PixelatedImage";
 
 export default function Archive() {
   return (
     <div className="flex flex-col gap-16 font-['Funnel_Sans']">
       <main className="w-full px-8 lg:grid lg:grid-cols-8 relative">
+        <div className="fixed w-full h-[100vh] z-[-1] top-0 left-0">
+            <Image
+              src="/assets/about-bg.webp"
+              alt="about-hero"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
         <div className="lg:col-span-5 w-full pt-[70vh] flex flex-col gap-4 mb-64">
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
             About

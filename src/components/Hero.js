@@ -495,6 +495,27 @@ export default function Hero() {
     }, 2000);
   }, []);
 
+  // 修改初始化動畫的 useEffect
+  useEffect(() => {
+    const handleTransitionComplete = () => {
+      // 重新初始化動畫
+      setTimeout(() => {
+        if (typeof window !== "undefined") {
+          gsap.registerPlugin(ScrollTrigger);
+          // 重新初始化您的動畫邏輯
+          // ...
+        }
+      }, 100);
+    };
+
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
+
+    return () => {
+      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
   return (
     <section
       ref={heroRef}
@@ -510,7 +531,7 @@ export default function Hero() {
         }`}
       >
         <Image
-          src="/assets/hero-bg.jpg"
+          src="/assets/hero-bg.webp"
           alt="background"
           width={1920}
           height={1080}

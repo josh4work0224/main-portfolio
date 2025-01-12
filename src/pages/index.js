@@ -44,25 +44,30 @@ export default function Home() {
     const handleRouteChangeStart = () => {
       console.log("Route change started");
       setIsWorksVisible(false); // 重置狀態
-      ScrollTrigger.getAll().forEach((t) => t.kill()); // 清理 ScrollTrigger
+      // 不要在這裡清理 ScrollTrigger
     };
 
     const handleRouteChangeComplete = () => {
       console.log("Route change completed");
+      // 移除這裡的立即重置
+    };
+
+    const handleTransitionComplete = () => {
+      console.log("Transition complete - reinitializing animations");
       setPageKey((prev) => prev + 1);
-      // 延遲初始化 ScrollTrigger，確保 DOM 準備好
       setTimeout(() => {
         initializeScrollTrigger();
-      }, 500); // 延遲 100 毫秒
+      }, 100);
     };
 
     router.events.on("routeChangeStart", handleRouteChangeStart);
     router.events.on("routeChangeComplete", handleRouteChangeComplete);
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
-      ScrollTrigger.getAll().forEach((t) => t.kill()); // 清理 ScrollTrigger
+      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
     };
   }, [router]);
 
