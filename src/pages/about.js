@@ -96,7 +96,7 @@ export default function Archive() {
             Experiences
           </span>
           <div
-            className="flex flex-col lg:col-span-4 lg:col-start-1 p-4 border relative bg-slate-100/10 border-gray-500 gap-2"
+            className="flex flex-col lg:col-span-4 lg:col-start-1 p-4 border relative bg-slate-100/10 border-white/10 gap-2"
             style={{
               backgroundImage: "url('./assets/tenten_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -125,7 +125,7 @@ export default function Archive() {
             </ul>
           </div>
           <div
-            className="flex flex-col lg:col-span-4 lg:col-start-3 p-4 border relative bg-slate-100/10 border-gray-500 gap-2"
+            className="flex flex-col lg:col-span-4 lg:col-start-3 p-4 border relative bg-slate-100/10 border-white/10 gap-2"
             style={{
               backgroundImage: "url('./assets/net_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -150,7 +150,7 @@ export default function Archive() {
             </ul>
           </div>
           <div
-            className="flex flex-col lg:col-span-4 lg:col-start-5 p-4 border relative bg-slate-100/10 border-gray-500 gap-2"
+            className="flex flex-col lg:col-span-4 lg:col-start-5 p-4 border relative bg-slate-100/10 border-white/10 gap-2"
             style={{
               backgroundImage: "url('./assets/domus_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -176,7 +176,7 @@ export default function Archive() {
             </ul>
           </div>
           <Link
-            className="flex flex-col lg:col-span-2 lg:col-start-7 p-4 border relative bg-slate-100/10 border-gray-500"
+            className="flex flex-col lg:col-span-2 lg:col-start-7 p-4 border relative bg-slate-100/10 border-white/10"
             href="#"
           >
             <div className="flex flex-row gap-4 items-end justify-between">

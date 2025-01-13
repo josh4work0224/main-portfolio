@@ -91,7 +91,7 @@ export async function getStaticProps({ params }) {
 const richTextOptions = {
   renderNode: {
     [BLOCKS.PARAGRAPH]: (node, children) => (
-      <p className="mb-4 text-xl leading-tight">{children}</p>
+      <p className="mb-4 text-lg leading-tight">{children}</p>
     ),
     [BLOCKS.HEADING_1]: (node, children) => (
       <h1 className="text-4xl mb-6">{children}</h1>
@@ -313,13 +313,13 @@ const WorkDetail = ({ work }) => {
                 <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
                   Client
                 </span>
-                <span className="text-xl">{work.fields.client}</span>
+                <span className="text-lg">{work.fields.client}</span>
               </div>
               <div className="flex flex-col gap-2 mb-8">
                 <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
                   Year
                 </span>
-                <span className="text-xl">
+                <span className="text-lg">
                   {new Date(work.fields.publishDate).getFullYear()}
                 </span>
               </div>
@@ -331,11 +331,11 @@ const WorkDetail = ({ work }) => {
                   {Array.isArray(work.fields.role) &&
                     work.fields.role.map((categoryRef, index) => (
                       <React.Fragment key={categoryRef.sys.id}>
-                        <span className="text-xl leading-none uppercase">
+                        <span className="text-lg leading-none uppercase">
                           {categoryRef.fields?.roleName || "Unnamed Role"}
                         </span>
                         {index < work.fields.role.length - 1 && (
-                          <span className="text-xl leading-none">■</span>
+                          <span className="text-lg leading-none">■</span>
                         )}
                       </React.Fragment>
                     ))}
@@ -349,11 +349,11 @@ const WorkDetail = ({ work }) => {
                   {Array.isArray(work.fields.toolsUsed) &&
                     work.fields.toolsUsed.map((categoryRef, index) => (
                       <React.Fragment key={categoryRef.sys.id}>
-                        <span className="text-xl leading-none uppercase">
+                        <span className="text-lg leading-none uppercase">
                           {categoryRef.fields?.toolName || "Unnamed Role"}
                         </span>
                         {index < work.fields.toolsUsed.length - 1 && (
-                          <span className="text-xl leading-none">■</span>
+                          <span className="text-lg leading-none">■</span>
                         )}
                       </React.Fragment>
                     ))}
