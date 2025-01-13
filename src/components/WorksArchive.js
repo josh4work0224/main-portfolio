@@ -96,7 +96,7 @@ const WorksArchive = ({ initialWorks }) => {
                       work.fields.type.map((categoryRef) => (
                         <span
                           key={categoryRef.sys.id}
-                          className="text-md font-thin px-1 mr-2 text-slate-600 uppercase bg-white leading-tight"
+                          className="px-[2px] py-[1px] mr-2 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]"
                         >
                           {categoryRef.fields?.tagName || "Unnamed Category"}
                         </span>
