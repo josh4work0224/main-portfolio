@@ -91,7 +91,7 @@ export async function getStaticProps({ params }) {
 const richTextOptions = {
   renderNode: {
     [BLOCKS.PARAGRAPH]: (node, children) => (
-      <p className="mb-4 text-lg leading-tight">{children}</p>
+      <p className="mb-4 text-xl leading-tight">{children}</p>
     ),
     [BLOCKS.HEADING_1]: (node, children) => (
       <h1 className="text-4xl font-bold mb-6">{children}</h1>
@@ -261,7 +261,7 @@ const WorkDetail = ({ work }) => {
         ></div>
         {work.fields.mainImage?.fields?.file?.url && (
           <div className="absolute w-full h-full z-10">
-            <PixelatedImage
+            <Image
               src={`https:${work.fields.mainImage.fields.file.url}`}
               alt={work.fields.mainImage.fields.file.title || "Hero image"}
               fill
@@ -303,7 +303,11 @@ const WorkDetail = ({ work }) => {
                 <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
                   Overview
                 </span>
-                <div className="text-xl">{work.fields.overview}</div>
+                {work.fields.summary &&
+                  documentToReactComponents(
+                    work.fields.summary,
+                    richTextOptions
+                  )}
               </div>
               <div className="flex flex-col gap-2 mb-8">
                 <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">

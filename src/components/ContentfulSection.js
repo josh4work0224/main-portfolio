@@ -114,7 +114,10 @@ const ContentfulSection = () => {
     window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
-      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
     };
   }, []);
 
@@ -161,8 +164,10 @@ const ContentfulSection = () => {
 
   useEffect(() => {
     const handleHomeNavigation = () => {
-      console.log("Home navigation detected - reinitializing ContentfulSection animations");
-      setRemountKey(prev => prev + 1);
+      console.log(
+        "Home navigation detected - reinitializing ContentfulSection animations"
+      );
+      setRemountKey((prev) => prev + 1);
       setTimeout(() => {
         initializeAnimations();
       }, 100);
@@ -171,7 +176,10 @@ const ContentfulSection = () => {
     window.addEventListener("homeNavigationComplete", handleHomeNavigation);
 
     return () => {
-      window.removeEventListener("homeNavigationComplete", handleHomeNavigation);
+      window.removeEventListener(
+        "homeNavigationComplete",
+        handleHomeNavigation
+      );
     };
   }, []);
 

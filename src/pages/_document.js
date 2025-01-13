@@ -10,7 +10,7 @@ export default function Document() {
       <Head>
         <link rel="icon" href="/chi4favicon.ico" />
       </Head>
-      <body className="antialiased">
+      <body className="antialiased bg-black">
         <Main />
         <NextScript />
       </body>

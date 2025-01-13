@@ -8,14 +8,14 @@ export default function Archive() {
     <div className="flex flex-col gap-16 font-['Funnel_Sans']">
       <main className="w-full px-8 lg:grid lg:grid-cols-8 relative">
         <div className="fixed w-full h-[100vh] z-[-1] top-0 left-0">
-            <PixelatedImage
-              src="/assets/about-bg.webp"
-              alt="about-hero"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+          <Image
+            src="/assets/about-bg.webp"
+            alt="about-hero"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
         <div className="lg:col-span-5 w-full pt-[70vh] flex flex-col gap-4 mb-64">
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
             About
@@ -35,15 +35,15 @@ export default function Archive() {
           </p>
         </div>
         <div className="lg:col-span-2 lg:col-start-7 pt-[70vh] pb-[8rem] flex flex-row justify-end">
-        <Image
-          src="/assets/personal-img.webp"
-          alt="background"
-          width={1920}
-          height={1080}
-          className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[40%]"
-        />
+          <PixelatedImage
+            src="/assets/personal-img.webp"
+            alt="background"
+            width={1920}
+            height={1080}
+            className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[30vh]"
+          />
         </div>
-        
+
         <div className="lg:col-span-6 w-full flex flex-col gap-4 lg:gap-y-8 mb-64 lg:grid lg:grid-cols-6">
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px] lg:justify-self-start">
             Expertise
@@ -104,22 +104,23 @@ export default function Archive() {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <h2 className="text-4xl">
-              UI/UX designer & Low/no-code developer
-            </h2>
+            <h2 className="text-4xl">UI/UX designer & Low/no-code developer</h2>
             <div className="flex flex-row gap-4 items-end">
               <h3 className="text-xl">tenten.co</h3>
               <h3 className="text-xl">2022-present</h3>
             </div>
             <ul className="text-lg list-[square] ml-4 leading-tight">
-              <li  className="mb-2">
-                Design and develop responsive websites with Webflow and Shopify, incorporating motion graphics for engaging user experiences.
+              <li className="mb-2">
+                Design and develop responsive websites with Webflow and Shopify,
+                incorporating motion graphics for engaging user experiences.
               </li>
               <li className="mb-2">
-                Automate workflows and optimize processes using tools like Make.com and Zapier.
+                Automate workflows and optimize processes using tools like
+                Make.com and Zapier.
               </li>
               <li>
-                Develop and prototype experimental digital products aligned with business goals.
+                Develop and prototype experimental digital products aligned with
+                business goals.
               </li>
             </ul>
           </div>
@@ -157,9 +158,7 @@ export default function Archive() {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <h2 className="text-4xl">
-              Master in Interaction Design
-            </h2>
+            <h2 className="text-4xl">Master in Interaction Design</h2>
             <div className="flex flex-row gap-4 items-end">
               <h3 className="text-xl">Domus Academy</h3>
               <h3 className="text-xl">2020-2021</h3>
@@ -176,18 +175,19 @@ export default function Archive() {
               </li>
             </ul>
           </div>
-          <Link className="flex flex-col lg:col-span-2 lg:col-start-7 p-4 border relative bg-slate-100/10 border-gray-500" href="#">  
+          <Link
+            className="flex flex-col lg:col-span-2 lg:col-start-7 p-4 border relative bg-slate-100/10 border-gray-500"
+            href="#"
+          >
             <div className="flex flex-row gap-4 items-end justify-between">
-              <h3 className="text-2xl font-semibold">
-                Learn me more on
-              </h3>
+              <h3 className="text-2xl font-semibold">Learn me more on</h3>
               <Image
-              src="/assets/linkedin-logo.svg"
-              alt="linkedin logo"
-              width="382"
-              height="382"
-              className="w-8 aspect-square"
-               />
+                src="/assets/linkedin-logo.svg"
+                alt="linkedin logo"
+                width="382"
+                height="382"
+                className="w-8 aspect-square"
+              />
             </div>
           </Link>
         </div>

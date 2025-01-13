@@ -14,6 +14,7 @@ function PixelatedImage({
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const animationRef = useRef(null);
 
   const renderPixelated = useCallback(
     (ctx, image, pixelSize) => {
@@ -70,6 +71,83 @@ function PixelatedImage({
     [width, height]
   );
 
+  const resetAnimation = useCallback(async () => {
+    if (canvasRef.current) {
+      try {
+        const { gsap } = await import("gsap");
+        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        const ctx = canvasRef.current.getContext("2d");
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        image.src = src;
+
+        // 重置為初始像素化狀態
+        image.onload = () => {
+          setImageLoaded(true);
+          renderPixelated(ctx, image, initialPixelSize);
+
+          // 重新觸發動畫
+          if (animationRef.current) {
+            animationRef.current.kill();
+          }
+
+          animationRef.current = gsap.to(
+            {},
+            {
+              pixelSize: 1,
+              duration: 1,
+              paused: true,
+              onUpdate: function () {
+                const currentPixelSize = Math.max(
+                  1,
+                  Math.round(initialPixelSize * (1 - this.progress()))
+                );
+                if (currentPixelSize % 2 === 0 || currentPixelSize <= 4) {
+                  renderPixelated(ctx, image, currentPixelSize);
+                }
+              },
+              ease: "power1.out",
+            }
+          );
+
+          // 創建新的 ScrollTrigger
+          ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: "top 80%",
+            onEnter: () => {
+              animationRef.current?.play();
+            },
+            once: true,
+          });
+        };
+      } catch (error) {
+        console.error("Error resetting animation:", error);
+      }
+    }
+  }, [src, initialPixelSize, renderPixelated]);
+
+  useEffect(() => {
+    // 監聽頁面轉換完成事件
+    const handleTransitionComplete = () => {
+      resetAnimation();
+    };
+
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
+
+    return () => {
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+    };
+  }, [resetAnimation]);
+
   useEffect(() => {
     let animation;
 
@@ -100,7 +178,6 @@ function PixelatedImage({
           setImageLoaded(true);
           renderPixelated(ctx, image, initialPixelSize);
 
-          // 減少更新頻率
           animation = gsap.to(
             {},
             {
@@ -108,7 +185,6 @@ function PixelatedImage({
               duration: 1,
               paused: true,
               onUpdate: function () {
-                // 只在較大的步進值更新
                 const currentPixelSize = Math.max(
                   1,
                   Math.round(initialPixelSize * (1 - this.progress()))
@@ -120,6 +196,8 @@ function PixelatedImage({
               ease: "power1.out",
             }
           );
+
+          animationRef.current = animation; // 保存動畫引用
 
           ScrollTrigger.create({
             trigger: containerRef.current,

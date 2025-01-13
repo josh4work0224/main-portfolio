@@ -3,13 +3,13 @@ import { createClient } from "contentful";
 import Link from "next/link";
 import Image from "next/image";
 
-const WorksArchive = () => {
-  const [works, setWorks] = useState([]);
-  const [selectedType, setSelectedType] = useState('all');
-  const [sortOrder, setSortOrder] = useState('newest');
-  const [allTypes, setAllTypes] = useState([]);
+const WorksArchive = ({ initialWorks }) => {
+  const [works, setWorks] = useState(initialWorks || []);
+  const [sortOrder, setSortOrder] = useState("newest");
 
   useEffect(() => {
+    if (initialWorks?.length > 0) return;
+
     if (
       !process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID ||
       !process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN
@@ -29,117 +29,84 @@ const WorksArchive = () => {
         include: 2,
       })
       .then((response) => {
-        console.log("API Response:", response.items[0]?.fields);
-
         const worksWithSlugs = response.items.map((item) => ({
           ...item,
           fields: {
             ...item.fields,
             slug: item.fields.slug || item.sys.id,
-            category: Array.isArray(item.fields.category)
-              ? item.fields.category
-              : item.fields.category
-              ? [item.fields.category]
-              : [],
           },
         }));
         setWorks(worksWithSlugs);
-        
-        const types = new Set();
-        worksWithSlugs.forEach(work => {
-          work.fields.type?.forEach(type => {
-            types.add(type.fields?.tagName);
-          });
-        });
-        setAllTypes(['all', ...Array.from(types)]);
       })
       .catch(console.error);
-  }, []);
+  }, [initialWorks]);
 
-  const filteredAndSortedWorks = works
-    .filter(work => {
-      if (selectedType === 'all') return true;
-      return work.fields.type?.some(type => type.fields?.tagName === selectedType);
-    })
-    .sort((a, b) => {
-      if (sortOrder === 'newest') {
-        return new Date(b.sys.createdAt) - new Date(a.sys.createdAt);
-      } else {
-        return new Date(a.sys.createdAt) - new Date(b.sys.createdAt);
-      }
-    });
+  const sortedWorks = [...works].sort((a, b) => {
+    if (sortOrder === "newest") {
+      return new Date(b.sys.createdAt) - new Date(a.sys.createdAt);
+    } else {
+      return new Date(a.sys.createdAt) - new Date(b.sys.createdAt);
+    }
+  });
 
   return (
     <section className="mt-[8rem] relative z-[95] bg-black w-full">
-      <div className="mb-8 flex flex-wrap gap-4 items-center">
-        <div className="flex gap-2">
-          {allTypes.map(type => (
-            <button
-              key={type}
-              onClick={() => setSelectedType(type)}
-              className={`px-4 py-2 rounded ${
-                selectedType === type 
-                  ? 'bg-white text-black' 
-                  : 'bg-gray-800 text-white'
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="bg-gray-800 text-white px-4 py-2 rounded"
+      <div className="mb-8 flex justify-start">
+        <button
+          onClick={() =>
+            setSortOrder(sortOrder === "newest" ? "oldest" : "newest")
+          }
+          className=" text-white py-2 flex items-center gap-2"
         >
-          <option value="newest">最新順序</option>
-          <option value="oldest">最舊順序</option>
-        </select>
+          <span>{sortOrder === "newest" ? "Latest" : "Oldest"}</span>
+          <span className="text-sm">↑↓</span>
+        </button>
       </div>
 
-      <div className="w-full mx-auto">
-        {filteredAndSortedWorks.map((work) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {sortedWorks.map((work) => (
           <Link
             href={`/works/${work.fields.slug}`}
             key={work.sys.id}
-            className="block group"
+            className="block group relative"
+            scroll={false}
           >
-            <div className="flex flex-col lg:flex-row justify-between items-start py-8 border-b border-gray-800 hover:bg-gray-900/30 transition-all duration-300 gap-6">
-              <div className="space-y-4 flex-1">
-                <h3 className="text-5xl font-light text-white group-hover:translate-x-2 transition-transform duration-300">
-                  {work.fields.client}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {Array.isArray(work.fields.type) &&
-                    work.fields.type.map((categoryRef) => (
-                      <span
-                        key={categoryRef.sys.id}
-                        className="text-md font-thin px-1 mr-2 text-slate-600 uppercase bg-white leading-tight"
-                      >
-                        {categoryRef.fields?.tagName || "Unnamed Category"}
-                      </span>
-                    ))}
+            <div className="border border-white/10 p-6 h-[300px] relative overflow-hidden">
+              {/* Hover Background Image */}
+              {work.fields.animate?.fields?.file?.url && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
+                  <Image
+                    src={`https:${work.fields.animate.fields.file.url}`}
+                    alt={work.fields.animate.fields.file.title || "Animation"}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-              </div>
+              )}
 
-              <div className="flex flex-col items-end gap-4">
-                {work.fields.animate?.fields?.file?.url && (
-                  <div className="relative h-[5rem] aspect-square overflow-hidden rounded-lg">
-                    <Image
-                      src={`https:${work.fields.animate.fields.file.url}`}
-                      alt={work.fields.animate.fields.file.title || "Animation"}
-                      fill
-                      className="object-cover"
-                      style={{
-                        animationPlayState: "var(--animation-play-state, running)"
-                      }}
-                    />
+              {/* Content */}
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <h2 className="text-5xl font-light text-white group-hover:translate-x-2 transition-transform duration-300">
+                  {work.fields.client}
+                </h2>
+
+                <div className="flex justify-between items-end">
+                  <div className="flex flex-wrap max-w-[80%]">
+                    {Array.isArray(work.fields.type) &&
+                      work.fields.type.map((categoryRef) => (
+                        <span
+                          key={categoryRef.sys.id}
+                          className="text-md font-thin px-1 mr-2 text-slate-600 uppercase bg-white leading-tight"
+                        >
+                          {categoryRef.fields?.tagName || "Unnamed Category"}
+                        </span>
+                      ))}
                   </div>
-                )}
-                <span className="inline-block text-white text-lg font-light opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                  View Project
-                  <span className="ml-2">→</span>
-                </span>
+
+                  <span className="text-white text-2xl transform translate-x-0 group-hover:translate-x-2 transition-transform duration-300">
+                    →
+                  </span>
+                </div>
               </div>
             </div>
           </Link>
