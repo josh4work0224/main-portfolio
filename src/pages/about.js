@@ -40,7 +40,7 @@ export default function Archive() {
             alt="background"
             width={1920}
             height={1080}
-            className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[30vh]"
+            className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[30vh] max-h-[10rem]"
           />
         </div>
 
