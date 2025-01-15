@@ -55,25 +55,25 @@ const WorksArchive = ({ initialWorks }) => {
     const initAnimation = () => {
       console.log("Initializing WorksArchive animations");
       // 清理現有的 ScrollTrigger 實例
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
       ScrollTrigger.clearMatchMedia();
       ScrollTrigger.refresh(true);
 
-      const cards = gridRef.current?.querySelectorAll('.work-card');
+      const cards = gridRef.current?.querySelectorAll(".work-card");
       if (!cards?.length) return;
 
       // 定義每列的起始和結束位置
       const columnOffsets = {
-        0: { start: 0, end: 0 },    // 第1列: 0 -> -40
-        1: { start: 60, end: -60 },    // 第2列: 80 -> 40
-        2: { start: 20, end: -20 },     // 第3列: 40 -> 0
-        3: { start: 40, end: -40 }    // 第4列: 120 -> 80
+        0: { start: 0, end: 0 },
+        1: { start: 120, end: -120 },
+        2: { start: 40, end: -40 },
+        3: { start: 80, end: -80 },
       };
 
       cards.forEach((card, index) => {
         const columnIndex = index % 4;
         const { start, end } = columnOffsets[columnIndex];
-        
+
         gsap.set(card, { y: start });
 
         gsap.to(card, {
@@ -81,13 +81,13 @@ const WorksArchive = ({ initialWorks }) => {
           duration: 1,
           ease: "none",
           scrollTrigger: {
-            trigger: card,
+            trigger: gridRef.current,
             start: "top center",
-            end: "75% center",
+            end: "bottom center",
             scrub: 1,
             invalidateOnRefresh: true,
             fastScrollEnd: true,
-          }
+          },
         });
       });
     };
@@ -95,14 +95,14 @@ const WorksArchive = ({ initialWorks }) => {
     // 路由變化處理
     const handleRouteChangeStart = (url) => {
       console.log("Route change started to:", url);
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
 
     const handleRouteChangeComplete = (url) => {
       console.log("Route change completed to:", url);
-      if (url === '/works') {
+      if (url === "/works") {
         console.log("Navigated to works - reinitializing animations");
-        setPageKey(prev => prev + 1);
+        setPageKey((prev) => prev + 1);
         setTimeout(() => {
           initAnimation();
         }, 100);
@@ -112,15 +112,15 @@ const WorksArchive = ({ initialWorks }) => {
     // 頁面轉場完成事件處理
     const handleTransitionComplete = () => {
       console.log("Transition complete in WorksArchive");
-      setPageKey(prev => prev + 1);
+      setPageKey((prev) => prev + 1);
       setTimeout(() => {
         initAnimation();
       }, 100);
     };
 
     // 添加事件監聽
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+    router.events.on("routeChangeComplete", handleRouteChangeComplete);
     window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     // 初始加載時初始化
@@ -132,11 +132,14 @@ const WorksArchive = ({ initialWorks }) => {
 
     // 清理函數
     return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+      router.events.off("routeChangeComplete", handleRouteChangeComplete);
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
       window.removeEventListener("load", initAnimation);
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, [works, sortOrder, pageKey, router]);
 
@@ -149,7 +152,10 @@ const WorksArchive = ({ initialWorks }) => {
   });
 
   return (
-    <section className="mt-[8rem] relative z-[95] bg-black w-full" key={pageKey}>
+    <section
+      className="mt-[8rem] relative z-[95] bg-black w-full"
+      key={pageKey}
+    >
       <div className="mb-8 flex justify-start">
         <button
           onClick={() =>
@@ -162,7 +168,10 @@ const WorksArchive = ({ initialWorks }) => {
         </button>
       </div>
 
-      <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        ref={gridRef}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
         {sortedWorks.map((work) => (
           <Link
             href={`/works/${work.fields.slug}`}
