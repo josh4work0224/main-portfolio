@@ -189,7 +189,7 @@ const ContentfulSection = () => {
         <Link
           href={`/works/${work.fields.slug}`}
           key={work.sys.id}
-          className="work-item block sticky top-[10vh] bg-black border  border-gray-200"
+          className="work-item block sticky top-[10vh] bg-black border  border-white/10"
           scroll={false}
         >
           <div className="block group">
