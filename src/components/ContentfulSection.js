@@ -139,9 +139,9 @@ const ContentfulSection = () => {
       .getEntries({
         content_type: "works",
         include: 2,
+        "fields.featured": true,
       })
       .then((response) => {
-        // 添加 console.log 來檢查數據結構
         console.log("API Response:", response.items[0]?.fields);
 
         const worksWithSlugs = response.items.map((item) => ({
@@ -149,7 +149,6 @@ const ContentfulSection = () => {
           fields: {
             ...item.fields,
             slug: item.fields.slug || item.sys.id,
-            // 確保 category 是一個陣列且為 Reference 類型
             category: Array.isArray(item.fields.category)
               ? item.fields.category
               : item.fields.category
@@ -189,10 +188,10 @@ const ContentfulSection = () => {
         <Link
           href={`/works/${work.fields.slug}`}
           key={work.sys.id}
-          className="work-item block sticky top-[10vh] bg-black border  border-white/10"
+          className="work-item block sticky top-[10vh] bg-black "
           scroll={false}
         >
-          <div className="block group">
+          <div className="block group border  border-gray-200 rounded-[2px]">
             <div className="overflow-hidden relative w-full h-[80vh] flex flex-col">
               <div className="w-full h-full abosulte">
                 {work.fields.mainImage?.fields?.file?.url && (

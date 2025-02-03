@@ -12,6 +12,8 @@ const WorksArchive = ({ initialWorks }) => {
   const gridRef = useRef(null);
   const [pageKey, setPageKey] = useState(0);
   const router = useRouter();
+  const isTransitioning = useRef(false);
+  const pendingSortChange = useRef(null);
 
   useEffect(() => {
     if (initialWorks?.length > 0) return;
@@ -52,96 +54,87 @@ const WorksArchive = ({ initialWorks }) => {
 
     gsap.registerPlugin(ScrollTrigger);
 
+    const columnOffsets = {
+      0: { start: 0, end: 0 },
+      1: { start: 120, end: -120 },
+      2: { start: 40, end: -40 },
+      3: { start: 80, end: -80 },
+    };
+
     const initAnimation = () => {
       console.log("Initializing WorksArchive animations");
-      // 清理現有的 ScrollTrigger 實例
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-      ScrollTrigger.clearMatchMedia();
-      ScrollTrigger.refresh(true);
 
       const cards = gridRef.current?.querySelectorAll(".work-card");
       if (!cards?.length) return;
 
-      // 定義每列的起始和結束位置
-      const columnOffsets = {
-        0: { start: 0, end: 0 },
-        1: { start: 120, end: -120 },
-        2: { start: 40, end: -40 },
-        3: { start: 80, end: -80 },
-      };
-
       cards.forEach((card, index) => {
         const columnIndex = index % 4;
-        const { start, end } = columnOffsets[columnIndex];
-
+        const { start } = columnOffsets[columnIndex];
         gsap.set(card, { y: start });
+      });
 
-        gsap.to(card, {
-          y: end,
-          duration: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: gridRef.current,
-            start: "top center",
-            end: "bottom center",
-            scrub: 1,
-            invalidateOnRefresh: true,
-            fastScrollEnd: true,
-          },
+      requestAnimationFrame(() => {
+        cards.forEach((card, index) => {
+          const columnIndex = index % 4;
+          const { start, end } = columnOffsets[columnIndex];
+
+          gsap.fromTo(
+            card,
+            { y: start },
+            {
+              y: end,
+              duration: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: "top 30%",
+                end: "center 30%",
+                scrub: 1,
+                invalidateOnRefresh: true,
+                fastScrollEnd: true,
+              },
+            }
+          );
         });
       });
     };
 
-    // 路由變化處理
-    const handleRouteChangeStart = (url) => {
-      console.log("Route change started to:", url);
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-    };
-
-    const handleRouteChangeComplete = (url) => {
-      console.log("Route change completed to:", url);
-      if (url === "/works") {
-        console.log("Navigated to works - reinitializing animations");
-        setPageKey((prev) => prev + 1);
-        setTimeout(() => {
-          initAnimation();
-        }, 100);
-      }
-    };
-
-    // 頁面轉場完成事件處理
     const handleTransitionComplete = () => {
-      console.log("Transition complete in WorksArchive");
-      setPageKey((prev) => prev + 1);
+      console.log("Page transition complete - reinitializing animations");
       setTimeout(() => {
+        ScrollTrigger.getAll().forEach((st) => st.kill());
+        setPageKey((prev) => prev + 1);
         initAnimation();
       }, 100);
     };
 
-    // 添加事件監聽
-    router.events.on("routeChangeStart", handleRouteChangeStart);
-    router.events.on("routeChangeComplete", handleRouteChangeComplete);
-    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
-
-    // 初始加載時初始化
     if (document.readyState === "complete") {
       initAnimation();
     } else {
       window.addEventListener("load", initAnimation);
     }
 
-    // 清理函數
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
+
     return () => {
-      router.events.off("routeChangeStart", handleRouteChangeStart);
-      router.events.off("routeChangeComplete", handleRouteChangeComplete);
       window.removeEventListener(
         "pageTransitionComplete",
         handleTransitionComplete
       );
       window.removeEventListener("load", initAnimation);
-      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, [works, sortOrder, pageKey, router]);
+
+  const handleSortChange = () => {
+    if (isTransitioning.current) {
+      // 如果正在轉場中，將排序變更儲存起來
+      pendingSortChange.current = sortOrder === "newest" ? "oldest" : "newest";
+      return;
+    }
+
+    // 否則直接更新排序
+    setSortOrder(sortOrder === "newest" ? "oldest" : "newest");
+  };
 
   const sortedWorks = [...works].sort((a, b) => {
     if (sortOrder === "newest") {
@@ -158,10 +151,8 @@ const WorksArchive = ({ initialWorks }) => {
     >
       <div className="mb-8 flex justify-start">
         <button
-          onClick={() =>
-            setSortOrder(sortOrder === "newest" ? "oldest" : "newest")
-          }
-          className=" text-white py-2 flex items-center gap-2"
+          onClick={handleSortChange}
+          className="text-white py-2 flex items-center gap-2"
         >
           <span>{sortOrder === "newest" ? "Latest" : "Oldest"}</span>
           <span className="text-sm">↑↓</span>
@@ -180,7 +171,6 @@ const WorksArchive = ({ initialWorks }) => {
             scroll={false}
           >
             <div className="border border-white/10 p-6 h-[300px] relative overflow-hidden">
-              {/* Hover Background Image */}
               {work.fields.animate?.fields?.file?.url && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
                   <Image
@@ -192,7 +182,6 @@ const WorksArchive = ({ initialWorks }) => {
                 </div>
               )}
 
-              {/* Content */}
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <h2 className="text-5xl font-light text-white group-hover:translate-x-2 transition-transform duration-300">
                   {work.fields.client}
