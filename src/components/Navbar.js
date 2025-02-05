@@ -112,9 +112,9 @@ export default function Navbar() {
         <Link href="/about" className="hover:text-gray-300" scroll={false}>
           About
         </Link>
-        <Link href="#" className="hover:text-gray-300" scroll={false}>
+        <a href="mailto:josh4work0224@gmail.com" className="hover:text-gray-300" target="_blank">
           Let&apos;s talk
-        </Link>
+        </a>
       </div>
 
       {/* Mobile menu */}
@@ -136,13 +136,13 @@ export default function Navbar() {
           >
             About
           </Link>
-          <Link
-            href="#"
+          <a 
+            href="mailto:josh4work0224@gmail.com"
             className="text-white hover:text-gray-300 text-2xl"
-            scroll={false}
+            target="_blank"
           >
             Let&apos;s talk
-          </Link>
+          </a>
         </div>
       </div>
     </nav>

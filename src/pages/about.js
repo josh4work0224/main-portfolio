@@ -177,7 +177,8 @@ export default function Archive() {
           </div>
           <Link
             className="flex flex-col lg:col-span-2 lg:col-start-7 py-4 px-8 border relative bg-slate-100/5 border-white/10 rounded-[2px] backdrop-blur-md"
-            href="#"
+            href="https://linkedin.com/in/sheng-chi-huang-9600371a7"
+            target="_blank"
           >
             <div className="flex flex-row gap-4 items-end justify-between">
               <h3 className="text-2xl">Learn me more on</h3>
