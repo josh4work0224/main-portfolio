@@ -275,9 +275,7 @@ const WorkDetail = ({ work }) => {
             className="flex flex-col max-w-[80rem] w-full h-[100vh] justify-center gap-4"
             id="text-hero"
           >
-            <h1 className="md:text-7xl text-4xl">
-              {work.fields.name}
-            </h1>
+            <h1 className="md:text-7xl text-4xl">{work.fields.name}</h1>
             <div className="flex flex-row gap-2">
               {Array.isArray(work.fields.type) &&
                 work.fields.type.map((categoryRef) => (
@@ -497,17 +495,17 @@ const WorkDetail = ({ work }) => {
                 )}
             </div>
             <div className="w-full col-span-3 col-start-6 aspect-video overflow-hidden flex self-start lg:order-2 order-1 group">
-              {work.fields.imageGallery?.[1]?.fields?.file?.url && (
+              {work.fields.imageGallery?.[3]?.fields?.file?.url && (
                 <PixelatedImage
-                  src={`https:${work.fields.imageGallery[1].fields.file.url}`}
+                  src={`https:${work.fields.imageGallery[3].fields.file.url}`}
                   alt={
-                    work.fields.imageGallery[1].fields.file.title ||
+                    work.fields.imageGallery[3].fields.file.title ||
                     "Gallery image"
                   }
                   width={1920}
                   height={1080}
                   className="object-cover w-full h-full  cursor-pointer"
-                  onClick={() => setIndex(1)}
+                  onClick={() => setIndex(3)}
                 />
               )}
               <div className="absolute top-4 right-4 p-2 flex flex-row">
@@ -527,16 +525,16 @@ const WorkDetail = ({ work }) => {
           </div>
           <div className="lg:grid lg:grid-cols-8 flex flex-col gap-y-16 gap-x-8 lg:py-8 pb-32 pt-0">
             <div className="w-full col-span-4 col-start-1 overflow-hidden flex aspect-video group">
-              {work.fields.imageGallery?.[0]?.fields?.file?.url && (
+              {work.fields.imageGallery?.[4]?.fields?.file?.url && (
                 <PixelatedImage
-                  src={`https:${work.fields.imageGallery[0].fields.file.url}`}
+                  src={`https:${work.fields.imageGallery[4].fields.file.url}`}
                   alt={
-                    work.fields.imageGallery[0].fields.file.title ||
+                    work.fields.imageGallery[4].fields.file.title ||
                     "Gallery image"
                   }
                   width={1920}
                   className="object-cover w-full h-full cursor-pointer"
-                  onClick={() => setIndex(0)}
+                  onClick={() => setIndex(4)}
                 />
               )}
               <div className="absolute top-4 right-4 p-2 flex flex-row">
@@ -581,35 +579,35 @@ const WorkDetail = ({ work }) => {
         >
           <h4 className="text-2xl leading-none">Live Site</h4>
           <div className="relative w-[2rem] h-[2rem] overflow-hidden">
-            <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 243 242" 
-              fill="none" 
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 243 242"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="absolute transform group-hover:-translate-y-8 group-hover:translate-x-8 transition-transform duration-300 ease-in-out"
             >
-              <path 
-                fillRule="evenodd" 
-                clipRule="evenodd" 
-                d="M140.745 95.0575L35 199.944L41.123 206L146.855 101.126L146.923 179.837L155.576 179.83L155.5 92.551L156 92.0556L155.5 91.5607L155.495 86.4999L150.378 86.4956L149.877 86L149.378 86.4947L61.2638 86.4199L61.2564 94.99L140.745 95.0575Z" 
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M140.745 95.0575L35 199.944L41.123 206L146.855 101.126L146.923 179.837L155.576 179.83L155.5 92.551L156 92.0556L155.5 91.5607L155.495 86.4999L150.378 86.4956L149.877 86L149.378 86.4947L61.2638 86.4199L61.2564 94.99L140.745 95.0575Z"
                 fill="currentColor"
                 strokeWidth="2"
               />
-              <rect x="156" y="36" width="50" height="50" fill="#BEF264"/>
+              <rect x="156" y="36" width="50" height="50" fill="#BEF264" />
             </svg>
-            <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 243 242" 
-              fill="none" 
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 243 242"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="absolute transform translate-y-8 -translate-x-8 group-hover:translate-y-0 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
             >
-              <path 
-                fillRule="evenodd" 
-                clipRule="evenodd" 
-                d="M140.745 95.0575L35 199.944L41.123 206L146.855 101.126L146.923 179.837L155.576 179.83L155.5 92.551L156 92.0556L155.5 91.5607L155.495 86.4999L150.378 86.4956L149.877 86L149.378 86.4947L61.2638 86.4199L61.2564 94.99L140.745 95.0575Z" 
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M140.745 95.0575L35 199.944L41.123 206L146.855 101.126L146.923 179.837L155.576 179.83L155.5 92.551L156 92.0556L155.5 91.5607L155.495 86.4999L150.378 86.4956L149.877 86L149.378 86.4947L61.2638 86.4199L61.2564 94.99L140.745 95.0575Z"
                 fill="currentColor"
                 strokeWidth="2"
               />

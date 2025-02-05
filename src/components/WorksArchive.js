@@ -15,6 +15,10 @@ const WorksArchive = ({ initialWorks }) => {
   const isTransitioning = useRef(false);
   const pendingSortChange = useRef(null);
 
+  // 添加一個 ref 來追踪 ScrollTrigger 實例
+  const scrollTriggers = useRef([]);
+  const shouldPreserveAnimations = useRef(false);
+
   useEffect(() => {
     if (initialWorks?.length > 0) return;
 
@@ -49,6 +53,7 @@ const WorksArchive = ({ initialWorks }) => {
       .catch(console.error);
   }, [initialWorks]);
 
+  // 修改動畫初始化邏輯
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -67,6 +72,10 @@ const WorksArchive = ({ initialWorks }) => {
       const cards = gridRef.current?.querySelectorAll(".work-card");
       if (!cards?.length) return;
 
+      // 清理之前的動畫
+      scrollTriggers.current.forEach((st) => st.kill());
+      scrollTriggers.current = [];
+
       cards.forEach((card, index) => {
         const columnIndex = index % 4;
         const { start } = columnOffsets[columnIndex];
@@ -78,7 +87,7 @@ const WorksArchive = ({ initialWorks }) => {
           const columnIndex = index % 4;
           const { start, end } = columnOffsets[columnIndex];
 
-          gsap.fromTo(
+          const tl = gsap.fromTo(
             card,
             { y: start },
             {
@@ -95,14 +104,31 @@ const WorksArchive = ({ initialWorks }) => {
               },
             }
           );
+
+          // 保存 ScrollTrigger 實例以便後續清理
+          scrollTriggers.current.push(tl.scrollTrigger);
         });
       });
     };
 
+    // 路由變化處理
+    const handleRouteChangeStart = () => {
+      isTransitioning.current = true;
+      // 不要在這裡清理動畫
+    };
+
+    const handleRouteChangeComplete = () => {
+      isTransitioning.current = false;
+      if (pendingSortChange.current !== null) {
+        setSortOrder(pendingSortChange.current);
+        pendingSortChange.current = null;
+      }
+    };
+
+    // Transition 完成後的處理
     const handleTransitionComplete = () => {
       console.log("Page transition complete - reinitializing animations");
       setTimeout(() => {
-        ScrollTrigger.getAll().forEach((st) => st.kill());
         setPageKey((prev) => prev + 1);
         initAnimation();
       }, 100);
@@ -114,16 +140,24 @@ const WorksArchive = ({ initialWorks }) => {
       window.addEventListener("load", initAnimation);
     }
 
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+    router.events.on("routeChangeComplete", handleRouteChangeComplete);
     window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+      router.events.off("routeChangeComplete", handleRouteChangeComplete);
       window.removeEventListener(
         "pageTransitionComplete",
         handleTransitionComplete
       );
       window.removeEventListener("load", initAnimation);
+      // 只在組件完全卸載時清理
+      if (!isTransitioning.current) {
+        scrollTriggers.current.forEach((st) => st.kill());
+      }
     };
-  }, [works, sortOrder, pageKey, router]);
+  }, [works, sortOrder, pageKey]);
 
   const handleSortChange = () => {
     if (isTransitioning.current) {
