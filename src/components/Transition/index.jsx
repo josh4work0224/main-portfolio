@@ -160,36 +160,31 @@ export default function Transition({ children }) {
         // 等待新頁面內容加載完成
         await new Promise((resolve) => {
           setDisplayChildren(children);
-
-          // 監聽頁面加載完成事件
-          const checkPageLoaded = () => {
-            const images = document.querySelectorAll("img");
-            const allImagesLoaded = Array.from(images).every(
-              (img) => img.complete
-            );
-
-            if (allImagesLoaded) {
-              resolve();
-            } else {
-              setTimeout(checkPageLoaded, 100);
-            }
-          };
-
-          checkPageLoaded();
+          resolve(); // 移除頁面加載檢查，直接解析 Promise
         });
 
         // Logo 顯示動畫
         if (shouldShowLogo(router.asPath)) {
           setShowLogo(true);
-          await new Promise((resolve) => setTimeout(resolve, 1000)); // Logo 動畫時間
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
 
         // 退場動畫
         window.scrollTo(0, 0);
         setShowLogo(false);
 
+        // 確保退場動畫完整執行
         await new Promise((resolve) => {
-          gsap.to(tiles, {
+          const timeline = gsap.timeline({
+            onComplete: () => {
+              setTimeout(() => {
+                window.dispatchEvent(new Event("pageTransitionComplete"));
+                resolve();
+              }, 100);
+            }
+          });
+
+          timeline.to(tiles, {
             opacity: 0,
             duration: 0.1,
             stagger: {
@@ -203,14 +198,11 @@ export default function Transition({ children }) {
             onUpdate: () => {
               setMosaicTiles([...tiles]);
             },
-            onComplete: () => {
-              setTimeout(() => {
-                window.dispatchEvent(new Event("pageTransitionComplete"));
-                resolve();
-              }, 100);
-            },
           });
         });
+
+        // 清理馬賽克
+        setMosaicTiles([]);
       };
 
       createAndFadeMosaic();
