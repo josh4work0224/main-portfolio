@@ -561,7 +561,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto p-8 pb-20"
+      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:p-8 p-4 pb-20"
     >
       <div className="fixed inset-0 z-10">
         <RiveComp />
