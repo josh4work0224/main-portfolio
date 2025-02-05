@@ -5,11 +5,13 @@ import Link from "next/link";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [shouldBlend, setShouldBlend] = useState(true);
   const menuRef = useRef(null);
   const menuContentRef = useRef(null);
 
   useEffect(() => {
     if (isMenuOpen) {
+      setShouldBlend(false);
       // Show the menu container first
       gsap.set(menuRef.current, {
         display: "flex",
@@ -54,13 +56,16 @@ export default function Navbar() {
           gsap.set(menuRef.current, {
             display: "none",
           });
+          setShouldBlend(true);
         },
       });
     }
   }, [isMenuOpen]);
 
   return (
-    <nav className="w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2 mix-blend-difference">
+    <nav className={`w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2 ${
+      shouldBlend ? 'mix-blend-difference' : ''
+    }`}>
       <span className="text-xl font-display lg:order-1 order-2 lg:col-span-1">
         <Link href="/" scroll={false}>
           <strong>SHENGCHI</strong> H.
