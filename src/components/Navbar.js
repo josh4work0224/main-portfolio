@@ -69,6 +69,20 @@ export default function Navbar() {
     }
   }, [isMenuOpen]);
 
+  // 添加監聽頁面轉場完成的事件
+  useEffect(() => {
+    const handleTransitionComplete = () => {
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('pageTransitionComplete', handleTransitionComplete);
+    return () => {
+      window.removeEventListener('pageTransitionComplete', handleTransitionComplete);
+    };
+  }, [isMenuOpen]);
+
   return (
     <nav className="w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2">
       <span className="text-xl font-display lg:order-1 order-2 lg:col-span-1">
