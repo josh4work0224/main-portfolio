@@ -126,14 +126,14 @@ export default function Navbar() {
           <Link
             href="/archive"
             className="text-white hover:text-gray-300 text-2xl"
-            scroll={false}
+            onClick={() => setIsMenuOpen(false)}
           >
             Works Archive
           </Link>
           <Link
             href="/about"
             className="text-white hover:text-gray-300 text-2xl"
-            scroll={false}
+            onClick={() => setIsMenuOpen(false)}
           >
             About
           </Link>
