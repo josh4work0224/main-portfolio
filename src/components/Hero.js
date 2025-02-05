@@ -67,12 +67,14 @@ export default function Hero() {
     if (!heroRef.current) return;
 
     setHoveredKeyword(keyword);
+    
+    // 先重置狀態，避免之前的動畫影響
     setShowImage(false);
+    setMosaicTiles([]);
 
     // Ghost text 更新
     if (ghostRef.current) {
-      const ghostHighlights =
-        ghostRef.current.querySelectorAll(".ghost-highlight");
+      const ghostHighlights = ghostRef.current.querySelectorAll(".ghost-highlight");
       ghostHighlights.forEach((highlight) => {
         const isActive = highlight.dataset.keyword === keyword;
         highlight.style.opacity = isActive ? "1" : "0";
@@ -82,96 +84,109 @@ export default function Hero() {
       });
     }
 
-    // Pixelate 動畫生成，加入隨機排序邏輯
+    // 馬賽克動畫邏輯
     const gridCols = 10;
     const gridRows = 10;
     const blockWidth = 100 / gridCols;
     const blockHeight = 100 / gridRows;
 
-    let newTiles = Array.from({ length: gridCols * gridRows }).map(
-      (_, index) => {
-        const col = index % gridCols;
-        const row = Math.floor(index / gridCols);
+    let newTiles = Array.from({ length: gridCols * gridRows }).map((_, index) => ({
+      id: index,
+      width: `${blockWidth}%`,
+      height: `${blockHeight}%`,
+      top: `${Math.floor(index / gridCols) * blockHeight}%`,
+      left: `${(index % gridCols) * blockWidth}%`,
+      opacity: 0,
+    }));
 
-        return {
-          id: index,
-          width: `${blockWidth}%`,
-          height: `${blockHeight}%`,
-          top: `${row * blockHeight}%`,
-          left: `${col * blockWidth}%`,
-          opacity: 0,
-        };
-      }
-    );
-
-    // 打亂順序（Fisher-Yates 洗牌算法）
+    // 打亂順序
     newTiles = newTiles.sort(() => Math.random() - 0.5);
-
     setMosaicTiles(newTiles);
 
-    // 用 GSAP 控制動畫
-    gsap.to(newTiles, {
+    // 使用單一 GSAP timeline 來控制動畫序列
+    const tl = gsap.timeline();
+
+    tl.to(newTiles, {
       opacity: 1,
-      stagger: (i) => 0.02 * i, // 根據隨機化的順序設置延遲
+      stagger: { 
+        each: 0.02,
+        from: "random"
+      },
       duration: 0.4,
       ease: "power2.inOut",
-      onUpdate: () => {
-        setMosaicTiles([...newTiles]);
+      onUpdate: () => setMosaicTiles([...newTiles])
+    })
+    .add(() => {
+      setShowImage(true);
+    })
+    .to(newTiles, {
+      opacity: 0,
+      stagger: { 
+        each: 0.02,
+        from: "random"
       },
-      onComplete: () => {
-        // 確保馬賽克完全顯示後，再設置圖片可見
-        setShowImage(true);
-        gsap.to(newTiles, {
-          opacity: 0,
-          stagger: (i) => 0.02 * i,
-          duration: 0.4,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            setMosaicTiles([...newTiles]);
-          },
-        });
-      },
+      duration: 0.4,
+      ease: "power2.inOut",
+      onUpdate: () => setMosaicTiles([...newTiles])
     });
   };
 
   const handleMouseLeave = () => {
     if (!heroRef.current) return;
 
-    setHoveredKeyword(null);
-    setShowImage(false);
+    // 使用防抖，避免快速移動滑鼠時的閃爍
+    const debounceTime = 100;
+    clearTimeout(window.leaveTimer);
+    
+    window.leaveTimer = setTimeout(() => {
+      setHoveredKeyword(null);
+      setShowImage(false);
 
-    // Ghost text 更新
-    if (ghostRef.current) {
-      const ghostHighlights =
-        ghostRef.current.querySelectorAll(".ghost-highlight");
-      ghostHighlights.forEach((highlight) => {
-        highlight.style.opacity = "0";
-        highlight.style.textShadow = "none";
+      // Ghost text 更新
+      if (ghostRef.current) {
+        const ghostHighlights = ghostRef.current.querySelectorAll(".ghost-highlight");
+        ghostHighlights.forEach((highlight) => {
+          highlight.style.opacity = "0";
+          highlight.style.textShadow = "none";
+        });
+      }
+
+      // 確保馬賽克完全消失
+      gsap.to(mosaicTiles, {
+        opacity: 0,
+        stagger: { 
+          each: 0.02,
+          from: "random"
+        },
+        duration: 0.4,
+        ease: "power2.inOut",
+        onUpdate: () => setMosaicTiles([...mosaicTiles]),
+        onComplete: () => setMosaicTiles([])
       });
+    }, debounceTime);
+  };
+
+  const handleGlobalClick = (e) => {
+    // 只在手機版處理
+    if (window.innerWidth >= 1024) return;
+    
+    // 檢查點擊是否在關鍵字上
+    const isKeywordClick = e.target.classList.contains('keyword-highlight');
+    
+    // 如果不是點擊關鍵字，且當前有高亮的關鍵字，則關閉高亮
+    if (!isKeywordClick && hoveredKeyword) {
+      handleMouseLeave();
     }
-
-    // 淡出動畫
-    const newTiles = mosaicTiles.map((tile) => ({
-      ...tile,
-      opacity: 1,
-    }));
-
-    gsap.to(newTiles, {
-      opacity: 0,
-      stagger: (i) => 0.02 * i,
-      duration: 0.4,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        setMosaicTiles([...newTiles]);
-      },
-    });
   };
 
   const handleKeywordClick = (keyword) => {
+    // 阻止事件冒泡，避免觸發全局點擊事件
+    event.stopPropagation();
+    
     if (hoveredKeyword === keyword) {
-      handleMouseLeave(); // 如果已经选中，取消选中
+      handleMouseLeave();
     } else {
-      handleMouseEnter(keyword); // 否则，选中该关键词
+      handleMouseEnter(keyword);
     }
   };
 
@@ -533,6 +548,15 @@ export default function Hero() {
       window.removeEventListener("homeNavigationComplete", handleHomeNavigation);
     };
   }, []);
+
+  useEffect(() => {
+    // 添加全局點擊監聽
+    document.addEventListener('click', handleGlobalClick);
+
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, [hoveredKeyword]); // 依賴於 hoveredKeyword 狀態
 
   return (
     <section
