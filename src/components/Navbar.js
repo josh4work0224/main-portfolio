@@ -45,16 +45,26 @@ export default function Navbar() {
         }
       );
     } else {
-      // Animate menu sliding out
-      gsap.to(menuRef.current, {
-        clipPath: "inset(0 0 0 100%)",
-        duration: 0.75,
-        ease: "power4.inOut",
+      // First animate menu items out
+      gsap.to(menuContentRef.current.children, {
+        x: 50,
+        opacity: 0,
+        duration: 0.3,
+        stagger: 0.05,
+        ease: "power2.in",
         onComplete: () => {
-          gsap.set(menuRef.current, {
-            display: "none",
+          // Then animate menu sliding out
+          gsap.to(menuRef.current, {
+            clipPath: "inset(0 0 0 100%)",
+            duration: 0.75,
+            ease: "power4.inOut",
+            onComplete: () => {
+              gsap.set(menuRef.current, {
+                display: "none",
+              });
+            },
           });
-        },
+        }
       });
     }
   }, [isMenuOpen]);
