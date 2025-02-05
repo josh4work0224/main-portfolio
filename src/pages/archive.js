@@ -6,7 +6,7 @@ export default function Archive({ totalWorks }) {
   return (
     <div className="flex flex-col gap-16 font-['Funnel_Sans']">
       <main className="w-full py-32 lg:px-8 px-4">
-        <h1 className="text-7xl">Works Archive ({totalWorks})</h1>
+        <h1 className="md:text-7xl text-4xl">Works Archive ({totalWorks})</h1>
         <WorksArchive />
       </main>
       <Footer />

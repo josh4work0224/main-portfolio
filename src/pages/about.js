@@ -20,7 +20,7 @@ export default function Archive() {
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
             About
           </span>
-          <h1 className="text-7xl">
+          <h1 className="md:text-7xl text-4xl">
             <span className="text-lime-300">[</span>SHENGCHI
             <span className="text-lime-300">]</span> is a web designer &
             creative developer based in Taiwan, passionate about crafting
