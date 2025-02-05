@@ -126,7 +126,7 @@ export default function Navbar() {
           <Link
             href="/archive"
             className="text-white hover:text-gray-300 text-2xl"
-            onClick={() => setIsMenuOpen(false)}
+            scroll={false}
           >
             Works Archive
           </Link>
@@ -134,7 +134,6 @@ export default function Navbar() {
             href="/about"
             className="text-white hover:text-gray-300 text-2xl"
             scroll={false}
-            onClick={() => setIsMenuOpen(false)}
           >
             About
           </Link>
@@ -142,7 +141,6 @@ export default function Navbar() {
             href="mailto:josh4work0224@gmail.com"
             className="text-white hover:text-gray-300 text-2xl"
             target="_blank"
-            onClick={() => setIsMenuOpen(false)}
           >
             Let&apos;s talk
           </a>
