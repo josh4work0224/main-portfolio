@@ -16,7 +16,7 @@ export default function Archive() {
             priority
           />
         </div>
-        <div className="lg:col-span-5 w-full pt-[70vh] flex flex-col gap-4 mb-64">
+        <div className="lg:col-span-5 w-full pt-[70vh] flex flex-col gap-4 lg:mb-64 mb-32">
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
             About
           </span>
@@ -34,13 +34,13 @@ export default function Archive() {
             resonate with users, bringing brands and ideas to life online.
           </p>
         </div>
-        <div className="lg:col-span-2 lg:col-start-7 pt-[70vh] pb-[8rem] flex flex-row justify-end">
+        <div className="lg:col-span-2 lg:col-start-7 lg:pt-[70vh] pb-[8rem] flex flex-row justify-end">
           <PixelatedImage
             src="/assets/personal-img.webp"
             alt="background"
             width={1920}
             height={1080}
-            className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[30vh] max-h-[10rem]"
+            className="object-cover lg:sticky lg:top-[20vh] lg:max-w-[20rem] h-[30vh] lg:max-h-[10rem] max-h-max"
           />
         </div>
 
@@ -91,12 +91,12 @@ export default function Archive() {
             </p>
           </div>
         </div>
-        <div className="lg:col-span-8 w-full flex flex-col gap-4 lg:gap-y-8 mb-4 lg:grid lg:grid-cols-8">
+        <div className="lg:col-span-8 w-full flex flex-col gap-8 lg:gap-y-8 mb-4 lg:grid lg:grid-cols-8">
           <span className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px] lg:justify-self-start">
             Experiences
           </span>
           <div
-            className="flex flex-col lg:col-span-3 lg:col-start-1 p-8 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] mb-8"
+            className="flex flex-col lg:col-span-3 lg:col-start-1 lg:p-8 p-4 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] lg:mb-8 mb-0"
             style={{
               backgroundImage: "url('./assets/tenten_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -125,7 +125,7 @@ export default function Archive() {
             </ul>
           </div>
           <div
-            className="flex flex-col lg:col-span-3 lg:col-start-3 p-8 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] mb-8"
+            className="flex flex-col lg:col-span-3 lg:col-start-3 lg:p-8 p-4 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] lg:mb-8 mb-0"
             style={{
               backgroundImage: "url('./assets/net_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -150,7 +150,7 @@ export default function Archive() {
             </ul>
           </div>
           <div
-            className="flex flex-col lg:col-span-3 lg:col-start-5 p-8 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] mb-8"
+            className="flex flex-col lg:col-span-3 lg:col-start-5 lg:p-8 p-4 border relative bg-slate-100/5 border-white/10 gap-2 backdrop-blur-md rounded-[2px] lg:mb-8 mb-0"
             style={{
               backgroundImage: "url('./assets/domus_logo.svg')",
               backgroundSize: "auto 10rem",
@@ -176,7 +176,7 @@ export default function Archive() {
             </ul>
           </div>
           <Link
-            className="flex flex-col lg:col-span-2 lg:col-start-7 py-4 px-8 border relative bg-slate-100/5 border-white/10 rounded-[2px] backdrop-blur-md"
+            className="flex flex-col lg:col-span-2 lg:col-start-7 py-4 lg:px-8 px-4 border relative bg-slate-100/5 border-white/10 rounded-[2px] backdrop-blur-md"
             href="https://linkedin.com/in/sheng-chi-huang-9600371a7"
             target="_blank"
           >
