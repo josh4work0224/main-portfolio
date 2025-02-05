@@ -11,6 +11,10 @@ export default function Transition({ children }) {
   const [clientLogo, setClientLogo] = useState(null);
   const router = useRouter();
   const [prevPath, setPrevPath] = useState(router.asPath);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
 
   const fetchWorkData = async (slug) => {
     const client = createClient({
@@ -37,21 +41,31 @@ export default function Transition({ children }) {
     return path.startsWith("/works/") && path !== "/works";
   };
 
+  const calculateGridSize = () => {
+    const baseSize = 40; // 基礎方塊大小（像素）
+    const width = windowSize.width;
+    const height = windowSize.height;
+    
+    const gridCols = Math.floor(width / baseSize);
+    const gridRows = Math.floor(height / baseSize);
+    
+    return {
+      rows: Math.max(10, Math.min(gridRows, 20)), // 最小 10 行，最大 20 行
+      cols: Math.max(15, Math.min(gridCols, 40)), // 最小 15 列，最大 40 列
+    };
+  };
+
   const createMosaicTiles = () => {
-    const gridRows = 15;
-    const gridCols = 30;
+    const { rows: gridRows, cols: gridCols } = calculateGridSize();
     const blockWidth = 100 / gridCols;
     const blockHeight = 100 / gridRows;
 
     let tiles = [];
 
-    // 為每一行創建方塊
     for (let row = 0; row < gridRows; row++) {
-      // 為每一行創建一個打亂順序的數組
       const colIndexes = Array.from({ length: gridCols }, (_, i) => i);
       shuffleArray(colIndexes);
 
-      // 根據打亂的順序創建方塊
       colIndexes.forEach((col, index) => {
         tiles.push({
           id: row * gridCols + col,
@@ -79,6 +93,27 @@ export default function Transition({ children }) {
     return array;
   };
 
+  // 添加視窗大小變化監聽
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 當視窗大小改變時重新計算馬賽克
+  useEffect(() => {
+    if (mosaicTiles.length > 0) {
+      const newTiles = createMosaicTiles();
+      setMosaicTiles(newTiles);
+    }
+  }, [windowSize]);
+
   useEffect(() => {
     if (router.asPath !== prevPath) {
       setPrevPath(router.asPath);
@@ -97,6 +132,8 @@ export default function Transition({ children }) {
         const tiles = createMosaicTiles();
         setMosaicTiles(tiles);
 
+        const { rows, cols } = calculateGridSize();
+        
         // 進場動畫
         await new Promise((resolve) => {
           gsap.to(tiles, {
@@ -105,7 +142,7 @@ export default function Transition({ children }) {
             stagger: {
               each: 0.02,
               from: "start",
-              grid: [15, 30],
+              grid: [rows, cols],
               axis: "x",
               amount: 0.5,
             },
@@ -158,7 +195,7 @@ export default function Transition({ children }) {
             stagger: {
               each: 0.02,
               from: "end",
-              grid: [15, 30],
+              grid: [rows, cols],
               axis: "x",
               amount: 0.5,
             },

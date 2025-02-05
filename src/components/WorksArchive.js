@@ -59,11 +59,35 @@ const WorksArchive = ({ initialWorks }) => {
 
     gsap.registerPlugin(ScrollTrigger);
 
-    const columnOffsets = {
-      0: { start: 0, end: 0 },
-      1: { start: 120, end: -120 },
-      2: { start: 40, end: -40 },
-      3: { start: 80, end: -80 },
+    // 根據不同斷點定義列數和偏移量
+    const getColumnConfig = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) { // lg breakpoint (4 columns)
+        return {
+          columns: 4,
+          offsets: {
+            0: { start: 0, end: 0 },
+            1: { start: 120, end: -120 },
+            2: { start: 40, end: -40 },
+            3: { start: 80, end: -80 },
+          }
+        };
+      } else if (width >= 768) { // md breakpoint (2 columns)
+        return {
+          columns: 2,
+          offsets: {
+            0: { start: 0, end: 0 },
+            1: { start: 60, end: -60 },
+          }
+        };
+      } else { // mobile (1 column)
+        return {
+          columns: 1,
+          offsets: {
+            0: { start: 0, end: 0 },
+          }
+        };
+      }
     };
 
     const initAnimation = () => {
@@ -76,16 +100,18 @@ const WorksArchive = ({ initialWorks }) => {
       scrollTriggers.current.forEach((st) => st.kill());
       scrollTriggers.current = [];
 
+      const { columns, offsets } = getColumnConfig();
+
       cards.forEach((card, index) => {
-        const columnIndex = index % 4;
-        const { start } = columnOffsets[columnIndex];
+        const columnIndex = index % columns;
+        const { start } = offsets[columnIndex];
         gsap.set(card, { y: start });
       });
 
       requestAnimationFrame(() => {
         cards.forEach((card, index) => {
-          const columnIndex = index % 4;
-          const { start, end } = columnOffsets[columnIndex];
+          const columnIndex = index % columns;
+          const { start, end } = offsets[columnIndex];
 
           const tl = gsap.fromTo(
             card,
@@ -110,6 +136,13 @@ const WorksArchive = ({ initialWorks }) => {
         });
       });
     };
+
+    // 添加視窗大小改變的監聽器
+    const handleResize = () => {
+      initAnimation();
+    };
+
+    window.addEventListener('resize', handleResize);
 
     // 路由變化處理
     const handleRouteChangeStart = () => {
@@ -156,6 +189,7 @@ const WorksArchive = ({ initialWorks }) => {
       if (!isTransitioning.current) {
         scrollTriggers.current.forEach((st) => st.kill());
       }
+      window.removeEventListener('resize', handleResize);
     };
   }, [works, sortOrder, pageKey]);
 
