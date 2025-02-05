@@ -189,14 +189,6 @@ export default function Transition({ children }) {
         setShowLogo(false);
 
         await new Promise((resolve) => {
-          // 確保在動畫開始前元素在視窗內
-          const overlay = document.querySelector('.fixed.inset-0.z-[9999]');
-          if (overlay) {
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-          }
-
           gsap.to(tiles, {
             opacity: 0,
             duration: 0.1,
@@ -212,14 +204,10 @@ export default function Transition({ children }) {
               setMosaicTiles([...tiles]);
             },
             onComplete: () => {
-              // 確保動畫完全結束後才觸發事件
-              requestAnimationFrame(() => {
+              setTimeout(() => {
                 window.dispatchEvent(new Event("pageTransitionComplete"));
-                if (overlay) {
-                  overlay.style.position = '';
-                }
                 resolve();
-              });
+              }, 100);
             },
           });
         });
