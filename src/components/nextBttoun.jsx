@@ -9,7 +9,7 @@ const NextButton = ({ nextProject }) => {
 
   return (
     <Link
-      className="col-start-7 col-span-2 flex flex-row p-4 border bg-slate-100/10 border-gray-500 items-center gap-4 w-auto justify-between relative group"
+      className="col-start-7 col-span-2 flex flex-row p-4 border transition-all bg-slate-100/5 hover:bg-slate-100/10 border-gray-500 items-center gap-4 w-auto justify-between relative group"
       href={`/works/${nextProject.slug}`}
       scroll={false}
       key={nextProject.sys?.id}
