@@ -290,7 +290,7 @@ const WorkDetail = ({ work }) => {
           </div>
         </div>
       </div>
-      <div className="h-[100vh] w-full relative" id="hero-space"></div>
+      <div className="h-[100dvh] w-full relative" id="hero-space"></div>
       <div className="w-full relative md:px-8 px-4 lg:grid lg:grid-cols-8 flex flex-col gap-x-8 z-30">
         {/* 保持原有的flex結構，但為右側內容添加offset */}
 

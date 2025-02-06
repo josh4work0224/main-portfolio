@@ -7,7 +7,7 @@ export default function Archive() {
   return (
     <div className="flex flex-col gap-16 font-['Funnel_Sans']">
       <main className="w-full px-4 md:px-8 lg:grid lg:grid-cols-8 relative">
-        <div className="fixed w-full h-[100vh] z-[-1] top-0 left-0">
+        <div className="fixed w-full h-[100dvh] z-[-1] top-0 left-0">
           <Image
             src="/assets/about-bg.webp"
             alt="about-hero"
