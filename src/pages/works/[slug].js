@@ -254,7 +254,7 @@ const WorkDetail = ({ work }) => {
   if (!work) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <div className="h-[100vh] w-full fixed top-0">
+      <div className="h-[100dvh] w-full fixed top-0">
         <div
           className="absolute w-full h-full bg-slate-900 z-20 opacity-50 brightness-100"
           id="hero-overlay"
