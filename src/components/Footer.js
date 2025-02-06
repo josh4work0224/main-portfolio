@@ -5,8 +5,8 @@ const Footer = () => {
   return (
     <footer className="relative bg-black text-white py-6 lg:px-8 px-4 mt-auto z-[999]">
       <div className="container mx-auto text-center">
-        <h2 className="text-xl font-bold mb-4">Get in Touch</h2>
-        <p className="mb-4">I would love to hear from you! Feel free to reach out.</p>
+        <h2 className="text-2xl font-medium mb-4">Get in Touch</h2>
+        <p className="mb-4 font-thin">I would love to hear from you! Feel free to reach out.</p>
         <div className="flex justify-center space-x-6 mb-4">
           <Link href="/archive" className="hover:text-gray-300 ease-linear">■ Works Archive</Link>
           <Link href="/about" className="hover:text-gray-300 ease-linear">■ About</Link>
