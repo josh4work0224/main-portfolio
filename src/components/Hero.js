@@ -67,14 +67,15 @@ export default function Hero() {
     if (!heroRef.current) return;
 
     setHoveredKeyword(keyword);
-    
+
     // 先重置狀態，避免之前的動畫影響
     setShowImage(false);
     setMosaicTiles([]);
 
     // Ghost text 更新
     if (ghostRef.current) {
-      const ghostHighlights = ghostRef.current.querySelectorAll(".ghost-highlight");
+      const ghostHighlights =
+        ghostRef.current.querySelectorAll(".ghost-highlight");
       ghostHighlights.forEach((highlight) => {
         const isActive = highlight.dataset.keyword === keyword;
         highlight.style.opacity = isActive ? "1" : "0";
@@ -90,14 +91,16 @@ export default function Hero() {
     const blockWidth = 100 / gridCols;
     const blockHeight = 100 / gridRows;
 
-    let newTiles = Array.from({ length: gridCols * gridRows }).map((_, index) => ({
-      id: index,
-      width: `${blockWidth}%`,
-      height: `${blockHeight}%`,
-      top: `${Math.floor(index / gridCols) * blockHeight}%`,
-      left: `${(index % gridCols) * blockWidth}%`,
-      opacity: 0,
-    }));
+    let newTiles = Array.from({ length: gridCols * gridRows }).map(
+      (_, index) => ({
+        id: index,
+        width: `${blockWidth}%`,
+        height: `${blockHeight}%`,
+        top: `${Math.floor(index / gridCols) * blockHeight}%`,
+        left: `${(index % gridCols) * blockWidth}%`,
+        opacity: 0,
+      })
+    );
 
     // 打亂順序
     newTiles = newTiles.sort(() => Math.random() - 0.5);
@@ -108,27 +111,27 @@ export default function Hero() {
 
     tl.to(newTiles, {
       opacity: 1,
-      stagger: { 
+      stagger: {
         each: 0.02,
-        from: "random"
+        from: "random",
       },
       duration: 0.4,
       ease: "power2.inOut",
-      onUpdate: () => setMosaicTiles([...newTiles])
+      onUpdate: () => setMosaicTiles([...newTiles]),
     })
-    .add(() => {
-      setShowImage(true);
-    })
-    .to(newTiles, {
-      opacity: 0,
-      stagger: { 
-        each: 0.02,
-        from: "random"
-      },
-      duration: 0.4,
-      ease: "power2.inOut",
-      onUpdate: () => setMosaicTiles([...newTiles])
-    });
+      .add(() => {
+        setShowImage(true);
+      })
+      .to(newTiles, {
+        opacity: 0,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        duration: 0.4,
+        ease: "power2.inOut",
+        onUpdate: () => setMosaicTiles([...newTiles]),
+      });
   };
 
   const handleMouseLeave = () => {
@@ -137,14 +140,15 @@ export default function Hero() {
     // 使用防抖，避免快速移動滑鼠時的閃爍
     const debounceTime = 100;
     clearTimeout(window.leaveTimer);
-    
+
     window.leaveTimer = setTimeout(() => {
       setHoveredKeyword(null);
       setShowImage(false);
 
       // Ghost text 更新
       if (ghostRef.current) {
-        const ghostHighlights = ghostRef.current.querySelectorAll(".ghost-highlight");
+        const ghostHighlights =
+          ghostRef.current.querySelectorAll(".ghost-highlight");
         ghostHighlights.forEach((highlight) => {
           highlight.style.opacity = "0";
           highlight.style.textShadow = "none";
@@ -154,14 +158,14 @@ export default function Hero() {
       // 確保馬賽克完全消失
       gsap.to(mosaicTiles, {
         opacity: 0,
-        stagger: { 
+        stagger: {
           each: 0.02,
-          from: "random"
+          from: "random",
         },
         duration: 0.4,
         ease: "power2.inOut",
         onUpdate: () => setMosaicTiles([...mosaicTiles]),
-        onComplete: () => setMosaicTiles([])
+        onComplete: () => setMosaicTiles([]),
       });
     }, debounceTime);
   };
@@ -169,10 +173,10 @@ export default function Hero() {
   const handleGlobalClick = (e) => {
     // 只在手機版處理
     if (window.innerWidth >= 1024) return;
-    
+
     // 檢查點擊是否在關鍵字上
-    const isKeywordClick = e.target.classList.contains('keyword-highlight');
-    
+    const isKeywordClick = e.target.classList.contains("keyword-highlight");
+
     // 如果不是點擊關鍵字，且當前有高亮的關鍵字，則關閉高亮
     if (!isKeywordClick && hoveredKeyword) {
       handleMouseLeave();
@@ -182,7 +186,7 @@ export default function Hero() {
   const handleKeywordClick = (keyword) => {
     // 阻止事件冒泡，避免觸發全局點擊事件
     event.stopPropagation();
-    
+
     if (hoveredKeyword === keyword) {
       handleMouseLeave();
     } else {
@@ -526,7 +530,10 @@ export default function Hero() {
     window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
-      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
@@ -545,16 +552,19 @@ export default function Hero() {
     window.addEventListener("homeNavigationComplete", handleHomeNavigation);
 
     return () => {
-      window.removeEventListener("homeNavigationComplete", handleHomeNavigation);
+      window.removeEventListener(
+        "homeNavigationComplete",
+        handleHomeNavigation
+      );
     };
   }, []);
 
   useEffect(() => {
     // 添加全局點擊監聽
-    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener("click", handleGlobalClick);
 
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, [hoveredKeyword]); // 依賴於 hoveredKeyword 狀態
 
@@ -577,14 +587,14 @@ export default function Hero() {
           alt="background"
           width={1920}
           height={1080}
-          className="object-cover lg:w-[25vw] h-[60vh] w-[70vw]"
+          className="object-cover lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem]"
         />
       </div>
 
       {/* Loading mosaic overlay */}
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
+          <div className="relative lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem] overflow-hidden">
             <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
               {loadingMosaicTiles.map((tile) => (
                 <div
@@ -621,7 +631,7 @@ export default function Hero() {
               : "z-[-1] opacity-0"
           }`}
         >
-          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
+          <div className="relative lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem] overflow-hidden">
             {/* Mosaic overlay */}
             <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
               {mosaicTiles.map((tile) => (

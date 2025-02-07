@@ -203,7 +203,7 @@ const ContentfulSection = () => {
                   />
                 )}
                 <div className="absolute w-full h-full bg-slate-800/[0.5] p-4">
-                  <div className="lg:w-[25%] w-full aspect-video abosulte top-2 left-2 z-40 border border-gray-200 rounded-md work-animate origin-top-left scale-0 overflow-hidden">
+                  <div className="lg:w-[25%] w-full max-w-[300px] aspect-video abosulte top-2 left-2 z-40 border border-gray-200 rounded-md work-animate origin-top-left scale-0 overflow-hidden">
                     {work.fields.animate?.fields?.file?.url && (
                       <Image
                         src={`https:${work.fields.animate.fields.file.url}`}
