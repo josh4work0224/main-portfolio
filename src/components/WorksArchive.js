@@ -209,9 +209,9 @@ const WorksArchive = ({ initialWorks }) => {
 
   const sortedWorks = [...works].sort((a, b) => {
     if (sortOrder === "newest") {
-      return new Date(b.sys.publishDate) - new Date(a.sys.publishDate);
+      return new Date(b.fields.publishDate) - new Date(a.fields.publishDate);
     } else {
-      return new Date(a.sys.publishDate) - new Date(b.sys.publishDate);
+      return new Date(a.fields.publishDate) - new Date(b.fields.publishDate);
     }
   });
 
