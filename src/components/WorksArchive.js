@@ -62,7 +62,8 @@ const WorksArchive = ({ initialWorks }) => {
     // 根據不同斷點定義列數和偏移量
     const getColumnConfig = () => {
       const width = window.innerWidth;
-      if (width >= 1024) { // lg breakpoint (4 columns)
+      if (width >= 1024) {
+        // lg breakpoint (4 columns)
         return {
           columns: 4,
           offsets: {
@@ -70,22 +71,24 @@ const WorksArchive = ({ initialWorks }) => {
             1: { start: 120, end: -120 },
             2: { start: 40, end: -40 },
             3: { start: 80, end: -80 },
-          }
+          },
         };
-      } else if (width >= 768) { // md breakpoint (2 columns)
+      } else if (width >= 768) {
+        // md breakpoint (2 columns)
         return {
           columns: 2,
           offsets: {
             0: { start: 0, end: 0 },
             1: { start: 60, end: -60 },
-          }
+          },
         };
-      } else { // mobile (1 column)
+      } else {
+        // mobile (1 column)
         return {
           columns: 1,
           offsets: {
             0: { start: 0, end: 0 },
-          }
+          },
         };
       }
     };
@@ -142,7 +145,7 @@ const WorksArchive = ({ initialWorks }) => {
       initAnimation();
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // 路由變化處理
     const handleRouteChangeStart = () => {
@@ -189,7 +192,7 @@ const WorksArchive = ({ initialWorks }) => {
       if (!isTransitioning.current) {
         scrollTriggers.current.forEach((st) => st.kill());
       }
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, [works, sortOrder, pageKey]);
 
@@ -240,7 +243,7 @@ const WorksArchive = ({ initialWorks }) => {
           >
             <div className="border border-white/10 p-6 h-[300px] relative overflow-hidden">
               {work.fields.animate?.fields?.file?.url && (
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
+                <div className="absolute inset-0 lg:opacity-0 lg:group-hover:opacity-20 opacity-20 transition-opacity duration-500">
                   <Image
                     src={`https:${work.fields.animate.fields.file.url}`}
                     alt={work.fields.animate.fields.file.title || "Animation"}
@@ -256,12 +259,12 @@ const WorksArchive = ({ initialWorks }) => {
                 </h2>
 
                 <div className="flex justify-between items-end">
-                  <div className="flex flex-wrap max-w-[80%]">
+                  <div className="flex flex-wrap max-w-[80%] gap-2">
                     {Array.isArray(work.fields.type) &&
                       work.fields.type.map((categoryRef) => (
                         <span
                           key={categoryRef.sys.id}
-                          className="px-[2px] py-[1px] mr-2 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]"
+                          className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]"
                         >
                           {categoryRef.fields?.tagName || "Unnamed Category"}
                         </span>
