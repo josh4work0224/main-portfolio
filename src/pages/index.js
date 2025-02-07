@@ -55,7 +55,7 @@ export default function Home() {
       if (url === "/") {
         console.log("Navigated to home - reinitializing animations");
         setTimeout(() => {
-          setPageKey(prev => prev + 1);
+          setPageKey((prev) => prev + 1);
           initializeScrollTrigger();
           // 觸發自定義事件來重新初始化其他組件
           window.dispatchEvent(new Event("homeNavigationComplete"));
@@ -65,7 +65,7 @@ export default function Home() {
 
     const handleTransitionComplete = () => {
       console.log("Transition complete - reinitializing animations");
-      setPageKey(prev => prev + 1);
+      setPageKey((prev) => prev + 1);
       setTimeout(() => {
         initializeScrollTrigger();
       }, 100);
@@ -78,7 +78,10 @@ export default function Home() {
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
-      window.removeEventListener("pageTransitionComplete", handleTransitionComplete);
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
     };
   }, [router]);
 
@@ -110,7 +113,7 @@ export default function Home() {
         </div>
         <section
           ref={worksRef}
-          className="lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-white"
+          className="lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-gray-100/45"
         >
           <h2 className="text-2xl font-bold text-white mb-8">Spotlight on</h2>
           <div>

@@ -191,7 +191,7 @@ const ContentfulSection = () => {
           className="work-item block sticky top-[10vh] bg-black "
           scroll={false}
         >
-          <div className="block group border  border-gray-200 rounded-[2px]">
+          <div className="block group border border-gray-100/45 rounded-[2px]">
             <div className="overflow-hidden relative w-full h-[80vh] flex flex-col">
               <div className="w-full h-full abosulte">
                 {work.fields.mainImage?.fields?.file?.url && (
@@ -203,7 +203,7 @@ const ContentfulSection = () => {
                   />
                 )}
                 <div className="absolute w-full h-full bg-slate-800/[0.5] p-4">
-                  <div className="lg:w-[25%] w-full max-w-[300px] aspect-video abosulte top-2 left-2 z-40 border border-gray-200 rounded-md work-animate origin-top-left scale-0 overflow-hidden">
+                  <div className="lg:w-[25%] w-full max-w-[300px] aspect-video abosulte top-2 left-2 z-40 border border-gray-100/45 rounded-md work-animate origin-top-left scale-0 overflow-hidden">
                     {work.fields.animate?.fields?.file?.url && (
                       <Image
                         src={`https:${work.fields.animate.fields.file.url}`}
@@ -239,7 +239,7 @@ const ContentfulSection = () => {
                       </div>
                     ))}
                 </div>
-                <div className="h-[1px] w-full bg-gray-200 divider-animation origin-left"></div>
+                <div className="h-[1px] w-full bg-gray-100/45 divider-animation origin-left"></div>
                 <div className="flex flex-col content-start py-2">
                   <span className="text-md text-white uppercase tracking-wide font-semibold">
                     <span className="text-lime-300">[ </span>
