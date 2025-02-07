@@ -176,7 +176,7 @@ export default function Archive() {
             </ul>
           </div>
           <Link
-            className="flex flex-col lg:col-span-2 lg:col-start-7 py-4 lg:px-8 px-4 border relative bg-slate-100/5 border-white/10 rounded-[2px] backdrop-blur-md"
+            className="flex flex-col lg:col-span-2 lg:col-start-7 py-4 px-4 border relative transition-all bg-slate-100/5 hover:bg-slate-100/10 border-white/10 rounded-[2px] backdrop-blur-md"
             href="https://linkedin.com/in/sheng-chi-huang-9600371a7"
             target="_blank"
           >

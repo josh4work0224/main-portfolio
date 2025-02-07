@@ -329,11 +329,11 @@ const WorkDetail = ({ work }) => {
                   {Array.isArray(work.fields.role) &&
                     work.fields.role.map((categoryRef, index) => (
                       <React.Fragment key={categoryRef.sys.id}>
-                        <span className="text-lg leading-none uppercase">
+                        <span className="text-lg uppercase">
                           {categoryRef.fields?.roleName || "Unnamed Role"}
                         </span>
                         {index < work.fields.role.length - 1 && (
-                          <span className="text-lg leading-none">■</span>
+                          <span className="text-lg">■</span>
                         )}
                       </React.Fragment>
                     ))}
@@ -347,11 +347,11 @@ const WorkDetail = ({ work }) => {
                   {Array.isArray(work.fields.toolsUsed) &&
                     work.fields.toolsUsed.map((categoryRef, index) => (
                       <React.Fragment key={categoryRef.sys.id}>
-                        <span className="text-lg leading-none uppercase">
+                        <span className="text-lg uppercase">
                           {categoryRef.fields?.toolName || "Unnamed Role"}
                         </span>
                         {index < work.fields.toolsUsed.length - 1 && (
-                          <span className="text-lg leading-none">■</span>
+                          <span className="text-lg">■</span>
                         )}
                       </React.Fragment>
                     ))}

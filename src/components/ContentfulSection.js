@@ -221,7 +221,7 @@ const ContentfulSection = () => {
               </div>
               <div className="relative h-full flex flex-col justify-end lg:px-8 px-4 py-4 items-start">
                 <div className="flex flex-col relative w-auto ">
-                  <h3 className="text-4xl text-white font-bold self-start z-[50] text-animation">
+                  <h3 className="text-4xl text-white font-medium self-start z-[50] text-animation">
                     {work.fields.client}
                   </h3>
                   <div className="absolute h-2 w-2 bg-lime-300 top-0 -right-2"></div>
