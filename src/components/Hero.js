@@ -587,14 +587,14 @@ export default function Hero() {
           alt="background"
           width={1920}
           height={1080}
-          className="object-cover lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem]"
+          className="object-cover lg:w-[25vw] h-[60vh] w-[70vw]"
         />
       </div>
 
       {/* Loading mosaic overlay */}
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="relative lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem] overflow-hidden">
+          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
             <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
               {loadingMosaicTiles.map((tile) => (
                 <div
@@ -631,7 +631,7 @@ export default function Hero() {
               : "z-[-1] opacity-0"
           }`}
         >
-          <div className="relative lg:w-[25vw] lg:max-w-max h-[60vh] w-[70vw] max-w-[20rem] overflow-hidden">
+          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
             {/* Mosaic overlay */}
             <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
               {mosaicTiles.map((tile) => (
