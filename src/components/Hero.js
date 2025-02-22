@@ -63,16 +63,80 @@ export default function Hero() {
     };
   }, []); // 空依賴數組，只在組件掛載時運行
 
+  const initializeMosaicTiles = (gridSize = 10) => {
+    const totalPixels = gridSize * gridSize;
+    let tiles = Array.from({ length: totalPixels }).map((_, index) => {
+      const col = index % gridSize;
+      const row = Math.floor(index / gridSize);
+      const size = 100 / gridSize;
+
+      return {
+        id: index,
+        width: `${size}%`,
+        height: `${size}%`,
+        top: `${row * size}%`,
+        left: `${col * size}%`,
+        display: "none", // Changed from opacity
+        backgroundColor: "#adff2f",
+      };
+    });
+
+    return tiles.sort(() => Math.random() - 0.5);
+  };
+
+  const animatePixels = (tiles, onComplete) => {
+    const timeline = gsap.timeline();
+
+    timeline
+      .to(tiles, {
+        display: "block",
+        duration: 0,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        onUpdate: () => setMosaicTiles([...tiles]),
+      })
+      .add(() => {
+        if (onComplete) onComplete();
+      })
+      .to(tiles, {
+        display: "none",
+        duration: 0,
+        delay: 0.4,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        onUpdate: () => setMosaicTiles([...tiles]),
+      });
+
+    return timeline;
+  };
+
   const handleMouseEnter = (keyword) => {
     if (!heroRef.current) return;
 
+    // 清除任何現有的離開定時器
+    clearTimeout(window.leaveTimer);
+
+    // 如果已經有關鍵字被選中，直接開始新的動畫
+    if (hoveredKeyword && hoveredKeyword !== keyword) {
+      // 如果有正在進行的動畫，立即完成它
+      if (window.currentAnimation) {
+        window.currentAnimation.progress(1);
+        window.currentAnimation.kill();
+      }
+      // 保持圖片可見，不重置透明度動畫
+      setShowImage(true);
+    } else if (!hoveredKeyword) {
+      // 只有在之前沒有選中關鍵字時才設置 showImage 為 false
+      setShowImage(false);
+    }
+
     setHoveredKeyword(keyword);
 
-    // 先重置狀態，避免之前的動畫影響
-    setShowImage(false);
-    setMosaicTiles([]);
-
-    // Ghost text 更新
+    // Update ghost text
     if (ghostRef.current) {
       const ghostHighlights =
         ghostRef.current.querySelectorAll(".ghost-highlight");
@@ -80,68 +144,58 @@ export default function Hero() {
         const isActive = highlight.dataset.keyword === keyword;
         highlight.style.opacity = isActive ? "1" : "0";
         highlight.style.textShadow = isActive
-          ? "0 0 10px #adff2f, 0 0 20px #adff2f, 0 0 30px #adff2f "
+          ? "0 0 10px #adff2f, 0 0 20px #adff2f, 0 0 30px #adff2f"
           : "none";
       });
     }
 
-    // 馬賽克動畫邏輯
-    const gridCols = 10;
-    const gridRows = 10;
-    const blockWidth = 100 / gridCols;
-    const blockHeight = 100 / gridRows;
+    const tiles = initializeMosaicTiles();
+    setMosaicTiles(tiles);
 
-    let newTiles = Array.from({ length: gridCols * gridRows }).map(
-      (_, index) => ({
-        id: index,
-        width: `${blockWidth}%`,
-        height: `${blockHeight}%`,
-        top: `${Math.floor(index / gridCols) * blockHeight}%`,
-        left: `${(index % gridCols) * blockWidth}%`,
-        opacity: 0,
-      })
-    );
+    // 創建一個新的動畫時間軸
+    const timeline = gsap.timeline();
+    window.currentAnimation = timeline;
 
-    // 打亂順序
-    newTiles = newTiles.sort(() => Math.random() - 0.5);
-    setMosaicTiles(newTiles);
-
-    // 使用單一 GSAP timeline 來控制動畫序列
-    const tl = gsap.timeline();
-
-    tl.to(newTiles, {
-      opacity: 1,
-      stagger: {
-        each: 0.02,
-        from: "random",
-      },
-      duration: 0.4,
-      ease: "power2.inOut",
-      onUpdate: () => setMosaicTiles([...newTiles]),
-    })
-      .add(() => {
-        setShowImage(true);
-      })
-      .to(newTiles, {
-        opacity: 0,
+    timeline
+      .to(tiles, {
+        display: "block",
+        duration: 0,
         stagger: {
           each: 0.02,
           from: "random",
         },
-        duration: 0.4,
-        ease: "power2.inOut",
-        onUpdate: () => setMosaicTiles([...newTiles]),
+        onUpdate: () => setMosaicTiles([...tiles]),
+      })
+      .add(() => {
+        setShowImage(true);
+      })
+      .to(tiles, {
+        display: "none",
+        duration: 0,
+        delay: 0.4,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        onUpdate: () => setMosaicTiles([...tiles]),
       });
   };
 
   const handleMouseLeave = () => {
     if (!heroRef.current) return;
 
-    // 使用防抖，避免快速移動滑鼠時的閃爍
-    const debounceTime = 100;
+    // 清除任何現有的定時器
     clearTimeout(window.leaveTimer);
 
+    // 設置一個較短的延遲，讓新的hover有機會取消這個動作
     window.leaveTimer = setTimeout(() => {
+      // 如果在這個延遲期間沒有新的hover事件，則執行離開動畫
+      if (window.currentAnimation) {
+        window.currentAnimation.progress(1);
+        window.currentAnimation.kill();
+        window.currentAnimation = null;
+      }
+
       setHoveredKeyword(null);
       setShowImage(false);
 
@@ -156,18 +210,18 @@ export default function Hero() {
       }
 
       // 確保馬賽克完全消失
-      gsap.to(mosaicTiles, {
-        opacity: 0,
+      const exitTiles = [...mosaicTiles];
+      gsap.to(exitTiles, {
+        display: "none",
         stagger: {
           each: 0.02,
           from: "random",
         },
-        duration: 0.4,
-        ease: "power2.inOut",
-        onUpdate: () => setMosaicTiles([...mosaicTiles]),
+        duration: 0,
+        onUpdate: () => setMosaicTiles([...exitTiles]),
         onComplete: () => setMosaicTiles([]),
       });
-    }, debounceTime);
+    }, 50); // 使用更短的延遲時間
   };
 
   const handleGlobalClick = (e) => {
@@ -284,11 +338,11 @@ export default function Hero() {
             const trigger = ScrollTrigger.create({
               trigger: heroRef.current,
               start: "top top",
-              end: "bottom bottom",
+              end: "90% bottom",
               scrub: true,
               immediateRender: false,
               onUpdate: (self) => {
-                const progress = self.progress;
+                const progress = self.progress * 1.25;
                 const lineStart = scrollPerLine * index;
                 const lineEnd = scrollPerLine * (index + 1);
                 const lineProgress = gsap.utils.clamp(
@@ -305,7 +359,7 @@ export default function Hero() {
                       const firstLineProgress = gsap.utils.clamp(
                         0,
                         1,
-                        self.progress * 3
+                        self.progress * 4
                       );
                       word.style.opacity =
                         wordIndex < words.length * firstLineProgress ? 1 : 0.1;
@@ -444,74 +498,38 @@ export default function Hero() {
 
   useEffect(() => {
     setTimeout(() => {
-      const initializeMosaicTiles = () => {
-        const gridCols = 10; // 定義列數
-        const gridRows = 10; // 定義行數
-        const blockWidth = 100 / gridCols;
-        const blockHeight = 100 / gridRows;
-
-        // 生成基本結構
-        let tiles = Array.from({ length: gridCols * gridRows }).map(
-          (_, index) => {
-            const col = index % gridCols;
-            const row = Math.floor(index / gridCols);
-
-            return {
-              id: index,
-              width: `${blockWidth}%`,
-              height: `${blockHeight}%`,
-              top: `${row * blockHeight}%`,
-              left: `${col * blockWidth}%`,
-              opacity: 0,
-              backgroundColor: "#adff2f",
-            };
-          }
-        );
-
-        // 隨機打亂順序
-        tiles = tiles.sort(() => Math.random() - 0.5);
-
-        return tiles;
-      };
-
-      const startLoadingAnimation = (tiles) => {
-        // 開始顯示動畫
-        gsap.to(tiles, {
-          opacity: 1,
-          stagger: 0.02,
-          duration: 0.4,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            setLoadingMosaicTiles([...tiles]);
-          },
-          onComplete: () => {
-            // 延遲背景出現和 tiles 淡出動畫
-            setTimeout(() => {
-              setShowBackground(true); // 背景顯示
-
-              // 淡出動畫
-              gsap.to(tiles, {
-                opacity: 0,
-                stagger: 0.02,
-                duration: 0.4,
-                ease: "power2.inOut",
-                onUpdate: () => {
-                  setLoadingMosaicTiles([...tiles]);
-                },
-                onComplete: () => {
-                  setIsLoading(false); // 完成後設置 loading 狀態為 false
-                },
-              });
-            }, 1000); // 背景出現的延遲
-          },
-        });
-      };
-
-      // 初始化 tiles 並啟動動畫
       const tiles = initializeMosaicTiles();
       setLoadingMosaicTiles(tiles);
-      startLoadingAnimation(tiles);
-    }, 2000);
+
+      // 只執行一次完整的進場動畫
+      gsap.to(tiles, {
+        display: "block",
+        duration: 0,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        onUpdate: () => setLoadingMosaicTiles([...tiles]),
+        onComplete: () => {
+          setShowBackground(true);
+          // 延遲後執行退場動畫
+          setTimeout(() => {
+            gsap.to(tiles, {
+              display: "none",
+              duration: 0,
+              stagger: {
+                each: 0.02,
+                from: "random",
+              },
+              onUpdate: () => setLoadingMosaicTiles([...tiles]),
+              onComplete: () => {
+                setIsLoading(false);
+              },
+            });
+          }, 800); // 調整這個時間以控制背景顯示的持續時間
+        },
+      });
+    }, 1000); // 減少初始延遲時間
   }, []);
 
   // 修改初始化動畫的 useEffect
@@ -568,11 +586,22 @@ export default function Hero() {
     };
   }, [hoveredKeyword]); // 依賴於 hoveredKeyword 狀態
 
+  // 在組件卸載時清理
+  useEffect(() => {
+    return () => {
+      if (window.currentAnimation) {
+        window.currentAnimation.kill();
+      }
+      clearTimeout(window.leaveTimer);
+    };
+  }, []);
+
   return (
     <section
       ref={heroRef}
       className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:p-8 p-4 pb-20"
     >
+      <div className="h-[60vh]"></div>
       <div className="fixed inset-0 z-10">
         <RiveComp />
       </div>
@@ -582,42 +611,16 @@ export default function Hero() {
           showBackground ? "opacity-100 " : "opacity-0"
         }`}
       >
-        <Image
-          src="/assets/hero-bg.webp"
-          alt="background"
-          width={1920}
-          height={1080}
-          className="object-cover lg:w-[25vw] h-[60vh] w-[70vw]"
-        />
-      </div>
-
-      {/* Loading mosaic overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
-            <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
-              {loadingMosaicTiles.map((tile) => (
-                <div
-                  key={tile.id}
-                  className="bg-[#adff2f] absolute"
-                  style={{
-                    width: tile.width,
-                    height: tile.height,
-                    top: tile.top,
-                    left: tile.left,
-                    opacity: tile.opacity,
-                    backgroundColor: tile.backgroundColor,
-                    boxShadow:
-                      tile.opacity > 0
-                        ? `0 0 10px ${tile.backgroundColor}, 0 0 20px ${tile.backgroundColor}`
-                        : "none",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
+          <Image
+            src="/assets/hero-bg.webp"
+            alt="background"
+            width={1920}
+            height={1080}
+            className="object-cover w-full h-full"
+          />
         </div>
-      )}
+      </div>
 
       {/* Keyword images */}
       {Object.entries(keywords).map(([keyword, imgSrc]) => (
@@ -631,7 +634,7 @@ export default function Hero() {
               : "z-[-1] opacity-0"
           }`}
         >
-          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
+          <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
             {/* Mosaic overlay */}
             <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
               {mosaicTiles.map((tile) => (
@@ -643,10 +646,10 @@ export default function Hero() {
                     height: tile.height,
                     top: tile.top,
                     left: tile.left,
-                    opacity: tile.opacity,
+                    display: tile.display,
                     backgroundColor: tile.backgroundColor,
                     boxShadow:
-                      tile.opacity > 0
+                      tile.display === "block"
                         ? `0 0 10px ${tile.backgroundColor}, 0 0 20px ${tile.backgroundColor}`
                         : "none",
                   }}
@@ -672,9 +675,37 @@ export default function Hero() {
         </div>
       ))}
 
+      {/* Loading mosaic overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center z-30 pointer-events-none">
+          <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
+            <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
+              {loadingMosaicTiles.map((tile) => (
+                <div
+                  key={tile.id}
+                  className="bg-[#adff2f] absolute"
+                  style={{
+                    width: tile.width,
+                    height: tile.height,
+                    top: tile.top,
+                    left: tile.left,
+                    display: tile.display,
+                    backgroundColor: tile.backgroundColor,
+                    boxShadow:
+                      tile.display === "block"
+                        ? `0 0 10px ${tile.backgroundColor}, 0 0 20px ${tile.backgroundColor}`
+                        : "none",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main text content */}
       <div
-        className={`w-full flex flex-col items-center gap-2 sticky top-[20%] z-30 transition-opacity duration-1000 ${
+        className={`w-full flex flex-col pb-24 items-center gap-2 sticky top-[20%] z-30 transition-opacity duration-1000 ${
           isLoading
             ? "opacity-0"
             : hoveredKeyword
@@ -683,7 +714,7 @@ export default function Hero() {
         }`}
       >
         <div className="line relative w-full">
-          <h1 className="split-text font-display text-wrap whitespace-normal overflow-wrap break-word">
+          <h1 className="split-text font-display text-wrap whitespace-normal overflow-wrap break-word leading-tight">
             Hello,
             <br />
             I&apos;m SHENG CHI (AKA Josh)
@@ -746,7 +777,7 @@ export default function Hero() {
             </span>
             .
           </h1>
-          <div className="flex flex-row gap-4 items-center">
+          <div className="flex flex-row gap-4 items-center mt-8">
             <div className="solid-blink w-4 h-4 bg-lime-300 shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_10px_#adff2f]"></div>
             <p className="text-lg">Based in Taipei</p>
           </div>

@@ -12,9 +12,17 @@ export default function Transition({ children }) {
   const router = useRouter();
   const [prevPath, setPrevPath] = useState(router.asPath);
   const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
   });
+
+  // 可調整的動畫參數
+  const ANIMATION_PARAMS = {
+    STAGGER_SPEED: 0.001, // 每個馬賽克的延遲時間 (原為 0.02)
+    CONTENT_DELAY: 500, // 內容切換前的延遲時間 (原為 500)
+    LOGO_DISPLAY_TIME: 1000, // Logo 顯示時間 (原為 1000)
+    EXIT_DELAY: 50, // 退場動畫完成後的延遲 (原為 100)
+  };
 
   const fetchWorkData = async (slug) => {
     const client = createClient({
@@ -45,10 +53,10 @@ export default function Transition({ children }) {
     const baseSize = 40; // 基礎方塊大小（像素）
     const width = windowSize.width;
     const height = windowSize.height;
-    
+
     const gridCols = Math.floor(width / baseSize);
     const gridRows = Math.floor(height / baseSize);
-    
+
     return {
       rows: Math.max(10, Math.min(gridRows, 20)), // 最小 10 行，最大 20 行
       cols: Math.max(15, Math.min(gridCols, 40)), // 最小 15 列，最大 40 列
@@ -61,36 +69,23 @@ export default function Transition({ children }) {
     const blockHeight = 100 / gridRows;
 
     let tiles = [];
+    const totalTiles = gridRows * gridCols;
 
-    for (let row = 0; row < gridRows; row++) {
-      const colIndexes = Array.from({ length: gridCols }, (_, i) => i);
-      shuffleArray(colIndexes);
-
-      colIndexes.forEach((col, index) => {
-        tiles.push({
-          id: row * gridCols + col,
-          width: `${blockWidth}%`,
-          height: `${blockHeight}%`,
-          top: `${row * blockHeight}%`,
-          left: `${col * blockWidth}%`,
-          opacity: 0,
-          row: row,
-          col: col,
-          shuffleIndex: index,
-        });
+    for (let i = 0; i < totalTiles; i++) {
+      const row = Math.floor(i / gridCols);
+      const col = i % gridCols;
+      tiles.push({
+        id: i,
+        width: `${blockWidth}%`,
+        height: `${blockHeight}%`,
+        top: `${row * blockHeight}%`,
+        left: `${col * blockWidth}%`,
+        display: "none",
+        backgroundColor: "#adff2f",
       });
     }
 
-    return tiles;
-  };
-
-  // Fisher-Yates 洗牌算法
-  const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+    return tiles.sort(() => Math.random() - 0.5);
   };
 
   // 添加視窗大小變化監聽
@@ -102,8 +97,8 @@ export default function Transition({ children }) {
       });
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // 當視窗大小改變時重新計算馬賽克
@@ -132,76 +127,61 @@ export default function Transition({ children }) {
         const tiles = createMosaicTiles();
         setMosaicTiles(tiles);
 
-        const { rows, cols } = calculateGridSize();
-        
         // 進場動畫
         await new Promise((resolve) => {
           gsap.to(tiles, {
-            opacity: 1,
-            duration: 0.2,
+            display: "block",
+            duration: 0,
             stagger: {
-              each: 0.02,
-              from: "start",
-              grid: [rows, cols],
-              axis: "x",
-              amount: 0.5,
+              each: ANIMATION_PARAMS.STAGGER_SPEED,
+              from: "random",
             },
-            ease: "none",
-            onUpdate: () => {
-              setMosaicTiles([...tiles]);
-            },
+            onUpdate: () => setMosaicTiles([...tiles]),
             onComplete: resolve,
           });
         });
 
-        // 添加 0.5 秒延遲
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 添加延遲
+        await new Promise((resolve) =>
+          setTimeout(resolve, ANIMATION_PARAMS.CONTENT_DELAY)
+        );
 
-        // 等待新頁面內容加載完成
+        // 等待新頁面內容加載
         await new Promise((resolve) => {
           setDisplayChildren(children);
-          resolve(); // 移除頁面加載檢查，直接解析 Promise
+          resolve();
         });
 
         // Logo 顯示動畫
         if (shouldShowLogo(router.asPath)) {
           setShowLogo(true);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) =>
+            setTimeout(resolve, ANIMATION_PARAMS.LOGO_DISPLAY_TIME)
+          );
         }
 
         // 退場動畫
         window.scrollTo(0, 0);
         setShowLogo(false);
 
-        // 確保退場動畫完整執行
         await new Promise((resolve) => {
-          const timeline = gsap.timeline({
+          gsap.to(tiles, {
+            display: "none",
+            duration: 0,
+            stagger: {
+              each: ANIMATION_PARAMS.STAGGER_SPEED,
+              from: "random",
+            },
+            onUpdate: () => setMosaicTiles([...tiles]),
             onComplete: () => {
               setTimeout(() => {
                 window.dispatchEvent(new Event("pageTransitionComplete"));
                 resolve();
-              }, 100);
-            }
-          });
-
-          timeline.to(tiles, {
-            opacity: 0,
-            duration: 0.1,
-            stagger: {
-              each: 0.02,
-              from: "end",
-              grid: [rows, cols],
-              axis: "x",
-              amount: 0.5,
-            },
-            ease: "none",
-            onUpdate: () => {
-              setMosaicTiles([...tiles]);
+              }, ANIMATION_PARAMS.EXIT_DELAY);
             },
           });
         });
 
-        // 清理馬賽克
         setMosaicTiles([]);
       };
 
@@ -257,16 +237,16 @@ export default function Transition({ children }) {
           {mosaicTiles.map((tile) => (
             <div
               key={tile.id}
-              className="absolute transition-all"
+              className="absolute"
               style={{
                 width: tile.width,
                 height: tile.height,
                 top: tile.top,
                 left: tile.left,
-                opacity: tile.opacity,
-                backgroundColor: "#adff2f",
+                display: tile.display,
+                backgroundColor: tile.backgroundColor,
                 boxShadow:
-                  tile.opacity > 0
+                  tile.display === "block"
                     ? "0 0 10px #adff2f, 0 0 20px #adff2f"
                     : "none",
               }}

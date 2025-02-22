@@ -7,8 +7,6 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SplitType from "split-type";
 import RiveComp from "./RiveComp";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Hero() {
   const heroRef = useRef(null);
   const ghostRef = useRef(null);
@@ -22,9 +20,9 @@ export default function Hero() {
   const [loadingMosaicTiles, setLoadingMosaicTiles] = useState([]);
 
   const keywords = {
-    WEBSITES: "/assets/websites.jpg",
-    "UI/UX": "/assets/uiux.jpg",
-    "LOW/NO CODE SOLUTIONS": "/assets/lowcode.jpg",
+    WEBSITES: "/assets/home-website.webp",
+    "UI/UX": "/assets/home-ui-ux.webp",
+    "LOW CODE SOLUTIONS": "/assets/home-develope.webp",
   };
 
   // 移動鼠標事件處理到一個獨立的useEffect中
@@ -69,7 +67,10 @@ export default function Hero() {
     if (!heroRef.current) return;
 
     setHoveredKeyword(keyword);
+
+    // 先重置狀態，避免之前的動畫影響
     setShowImage(false);
+    setMosaicTiles([]);
 
     // Ghost text 更新
     if (ghostRef.current) {
@@ -84,272 +85,347 @@ export default function Hero() {
       });
     }
 
-    // Pixelate 動畫生成，加入隨機排序邏輯
+    // 馬賽克動畫邏輯
     const gridCols = 10;
     const gridRows = 10;
     const blockWidth = 100 / gridCols;
     const blockHeight = 100 / gridRows;
 
     let newTiles = Array.from({ length: gridCols * gridRows }).map(
-      (_, index) => {
-        const col = index % gridCols;
-        const row = Math.floor(index / gridCols);
-
-        return {
-          id: index,
-          width: `${blockWidth}%`,
-          height: `${blockHeight}%`,
-          top: `${row * blockHeight}%`,
-          left: `${col * blockWidth}%`,
-          opacity: 0,
-        };
-      }
+      (_, index) => ({
+        id: index,
+        width: `${blockWidth}%`,
+        height: `${blockHeight}%`,
+        top: `${Math.floor(index / gridCols) * blockHeight}%`,
+        left: `${(index % gridCols) * blockWidth}%`,
+        opacity: 0,
+      })
     );
 
-    // 打亂順序（Fisher-Yates 洗牌算法）
+    // 打亂順序
     newTiles = newTiles.sort(() => Math.random() - 0.5);
-
     setMosaicTiles(newTiles);
 
-    // 用 GSAP 控制動畫
-    gsap.to(newTiles, {
+    // 使用單一 GSAP timeline 來控制動畫序列
+    const tl = gsap.timeline();
+
+    tl.to(newTiles, {
       opacity: 1,
-      stagger: (i) => 0.02 * i, // 根據隨機化的順序設置延遲
+      stagger: {
+        each: 0.02,
+        from: "random",
+      },
       duration: 0.4,
       ease: "power2.inOut",
-      onUpdate: () => {
-        setMosaicTiles([...newTiles]);
-      },
-      onComplete: () => {
-        // 確保馬賽克完全顯示後，再設置圖片可見
+      onUpdate: () => setMosaicTiles([...newTiles]),
+    })
+      .add(() => {
         setShowImage(true);
-        gsap.to(newTiles, {
-          opacity: 0,
-          stagger: (i) => 0.02 * i,
-          duration: 0.4,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            setMosaicTiles([...newTiles]);
-          },
-        });
-      },
-    });
+      })
+      .to(newTiles, {
+        opacity: 0,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        duration: 0.4,
+        ease: "power2.inOut",
+        onUpdate: () => setMosaicTiles([...newTiles]),
+      });
   };
 
   const handleMouseLeave = () => {
     if (!heroRef.current) return;
 
-    setHoveredKeyword(null);
-    setShowImage(false);
+    // 使用防抖，避免快速移動滑鼠時的閃爍
+    const debounceTime = 100;
+    clearTimeout(window.leaveTimer);
 
-    // Ghost text 更新
-    if (ghostRef.current) {
-      const ghostHighlights =
-        ghostRef.current.querySelectorAll(".ghost-highlight");
-      ghostHighlights.forEach((highlight) => {
-        highlight.style.opacity = "0";
-        highlight.style.textShadow = "none";
+    window.leaveTimer = setTimeout(() => {
+      setHoveredKeyword(null);
+      setShowImage(false);
+
+      // Ghost text 更新
+      if (ghostRef.current) {
+        const ghostHighlights =
+          ghostRef.current.querySelectorAll(".ghost-highlight");
+        ghostHighlights.forEach((highlight) => {
+          highlight.style.opacity = "0";
+          highlight.style.textShadow = "none";
+        });
+      }
+
+      // 確保馬賽克完全消失
+      gsap.to(mosaicTiles, {
+        opacity: 0,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        duration: 0.4,
+        ease: "power2.inOut",
+        onUpdate: () => setMosaicTiles([...mosaicTiles]),
+        onComplete: () => setMosaicTiles([]),
       });
+    }, debounceTime);
+  };
+
+  const handleGlobalClick = (e) => {
+    // 只在手機版處理
+    if (window.innerWidth >= 1024) return;
+
+    // 檢查點擊是否在關鍵字上
+    const isKeywordClick = e.target.classList.contains("keyword-highlight");
+
+    // 如果不是點擊關鍵字，且當前有高亮的關鍵字，則關閉高亮
+    if (!isKeywordClick && hoveredKeyword) {
+      handleMouseLeave();
     }
-
-    // 淡出動畫
-    const newTiles = mosaicTiles.map((tile) => ({
-      ...tile,
-      opacity: 1,
-    }));
-
-    gsap.to(newTiles, {
-      opacity: 0,
-      stagger: (i) => 0.02 * i,
-      duration: 0.4,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        setMosaicTiles([...newTiles]);
-      },
-    });
   };
 
   const handleKeywordClick = (keyword) => {
+    // 阻止事件冒泡，避免觸發全局點擊事件
+    event.stopPropagation();
+
     if (hoveredKeyword === keyword) {
-      handleMouseLeave(); // 如果已经选中，取消选中
+      handleMouseLeave();
     } else {
-      handleMouseEnter(keyword); // 否则，选中该关键词
+      handleMouseEnter(keyword);
     }
   };
 
-  // 初始化 ScrollTrigger 和 SplitText
+  // 修改初始化 ScrollTrigger 和 SplitText 的 useEffect
   useEffect(() => {
-    if (!heroRef.current) return;
+    // 確保在客戶端環境中
+    if (typeof window !== "undefined") {
+      // 在這裡註冊 ScrollTrigger
+      gsap.registerPlugin(ScrollTrigger);
 
-    const textElement = heroRef.current.querySelector(".split-text");
-    if (!textElement) return;
+      // 等待一下確保 DOM 完全載入
+      const timer = setTimeout(() => {
+        if (!heroRef.current) return;
 
-    const splitText = new SplitType(textElement, {
-      types: "lines,words",
-      tagName: "span",
-    });
+        const textElement = heroRef.current.querySelector(".split-text");
+        if (!textElement) return;
 
-    splitTextRef.current = splitText;
+        // 將 ghostContainer 的創建移到 setTimeout 外部
+        const ghostContainer = document.createElement("div");
+        ghostContainer.className = "ghost-container";
+        ghostContainer.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: auto;
+          pointer-events: none;
+          z-index: 50;
+        `;
 
-    // 創建和設置 ghost container
-    const ghostContainer = document.createElement("div");
-    ghostContainer.className = "ghost-container";
-    ghostContainer.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: auto;
-      pointer-events: none;
-      z-index: 50;
-    `;
+        // 添加 ghost container 到 DOM
+        heroRef.current.appendChild(ghostContainer);
+        ghostRef.current = ghostContainer;
 
-    const ghostH1 = textElement.cloneNode(true);
-    ghostH1.classList.remove("split-text");
-    ghostH1.classList.add("ghost-text");
+        // 確保在組件掛載後等待一小段時間再初始化
+        const initTimer = setTimeout(() => {
+          const splitText = new SplitType(textElement, {
+            types: "lines,words",
+            tagName: "span",
+          });
 
-    // 處理 ghost text
-    const processNode = (node) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const span = document.createElement("span");
-        span.textContent = node.textContent;
-        span.style.opacity = "0";
-        return span;
-      }
+          splitTextRef.current = splitText;
 
-      if (node.classList && node.classList.contains("keyword-highlight")) {
-        const clone = node.cloneNode(true);
-        clone.classList.remove("cursor-pointer");
-        clone.classList.add("ghost-highlight");
-        clone.style.opacity = "0";
-        clone.dataset.keyword = node.textContent.trim();
-        return clone;
-      }
+          const ghostH1 = textElement.cloneNode(true);
+          ghostH1.classList.remove("split-text");
+          ghostH1.classList.add("ghost-text");
 
-      const clone = node.cloneNode(false);
-      clone.style.opacity = "1";
-      Array.from(node.childNodes).forEach((child) => {
-        clone.appendChild(processNode(child));
-      });
-      return clone;
-    };
-
-    const processedH1 = processNode(ghostH1);
-    ghostContainer.appendChild(processedH1);
-
-    // 設置滾動動畫
-    splitText.words.forEach((word) => {
-      word.style.opacity = 0.1;
-    });
-
-    const totalLines = splitText.lines.length;
-    const scrollPerLine = 1 / totalLines;
-
-    splitText.lines.forEach((line, index) => {
-      const words = line.querySelectorAll(".word");
-      const ghostWords = processedH1.querySelectorAll(".word");
-
-      const trigger = ScrollTrigger.create({
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => {
-          const progress = self.progress;
-          const lineStart = scrollPerLine * index;
-          const lineEnd = scrollPerLine * (index + 1);
-          const lineProgress = gsap.utils.clamp(
-            0,
-            1,
-            (progress - lineStart) / (lineEnd - lineStart)
-          );
-
-          const wordsToShow = Math.floor(words.length * lineProgress);
-
-          words.forEach((word, wordIndex) => {
-            if (word) {
-              word.style.opacity = wordIndex < wordsToShow ? 1 : 0.1;
+          // 處理 ghost text
+          const processNode = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              const span = document.createElement("span");
+              span.textContent = node.textContent;
+              span.style.opacity = "0";
+              return span;
             }
-            if (ghostWords[wordIndex]) {
-              ghostWords[wordIndex].style.opacity =
-                wordIndex < wordsToShow ? 1 : 0;
+
+            if (
+              node.classList &&
+              node.classList.contains("keyword-highlight")
+            ) {
+              const clone = node.cloneNode(true);
+              clone.classList.remove("cursor-pointer");
+              clone.classList.add("ghost-highlight");
+              clone.style.opacity = "0";
+              clone.dataset.keyword = node.textContent.trim();
+              return clone;
+            }
+
+            const clone = node.cloneNode(false);
+            clone.style.opacity = "1";
+            Array.from(node.childNodes).forEach((child) => {
+              clone.appendChild(processNode(child));
+            });
+            return clone;
+          };
+
+          const processedH1 = processNode(ghostH1);
+          ghostContainer.appendChild(processedH1);
+
+          // 修改滾動動畫的初始化
+          splitText.words.forEach((word) => {
+            word.style.opacity = 0.1;
+          });
+
+          const totalLines = splitText.lines.length;
+          const scrollPerLine = 1 / totalLines;
+
+          splitText.lines.forEach((line, index) => {
+            const words = line.querySelectorAll(".word");
+            const ghostWords = processedH1.querySelectorAll(".word");
+
+            const trigger = ScrollTrigger.create({
+              trigger: heroRef.current,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: true,
+              immediateRender: false,
+              onUpdate: (self) => {
+                const progress = self.progress;
+                const lineStart = scrollPerLine * index;
+                const lineEnd = scrollPerLine * (index + 1);
+                const lineProgress = gsap.utils.clamp(
+                  0,
+                  1,
+                  (progress - lineStart) / (lineEnd - lineStart)
+                );
+
+                const wordsToShow = Math.floor(words.length * lineProgress);
+
+                words.forEach((word, wordIndex) => {
+                  if (word) {
+                    if (index === 0) {
+                      const firstLineProgress = gsap.utils.clamp(
+                        0,
+                        1,
+                        self.progress * 3
+                      );
+                      word.style.opacity =
+                        wordIndex < words.length * firstLineProgress ? 1 : 0.1;
+                    } else {
+                      word.style.opacity = wordIndex < wordsToShow ? 1 : 0.1;
+                    }
+                  }
+                  if (ghostWords[wordIndex]) {
+                    ghostWords[wordIndex].style.opacity =
+                      wordIndex < wordsToShow ? 1 : 0;
+                  }
+                });
+              },
+              onRefreshInit: () => {
+                updateGhostPosition();
+              },
+            });
+
+            scrollTriggersRef.current.push(trigger);
+          });
+
+          // 強制刷新
+          ScrollTrigger.refresh();
+
+          // 添加這個來確保初始狀態正確
+          ScrollTrigger.addEventListener("refresh", () => {
+            const progress = ScrollTrigger.getAll()[0]?.progress ?? 0;
+            if (
+              progress === 0 &&
+              splitTextRef.current &&
+              splitTextRef.current.lines
+            ) {
+              const firstLine = splitTextRef.current.lines[0];
+              if (firstLine) {
+                splitTextRef.current.words.forEach((word) => {
+                  if (firstLine.contains(word)) {
+                    word.style.opacity = 0.1;
+                  }
+                });
+              }
             }
           });
-        },
-      });
+        }, 1000); // 增加延遲時間
 
-      scrollTriggersRef.current.push(trigger);
-    });
+        // 修改位置同步邏輯
+        const updateGhostPosition = () => {
+          if (!textElement || !ghostContainer || !heroRef.current) return;
 
-    // 添加 ghost container
-    heroRef.current.appendChild(ghostContainer);
-    ghostRef.current = ghostContainer;
+          const rect = textElement.getBoundingClientRect();
+          const heroRect = heroRef.current.getBoundingClientRect();
 
-    // 修改位置同步邏輯
-    const updateGhostPosition = () => {
-      if (!textElement || !ghostContainer || !heroRef.current) return;
+          // 添加響應式判斷
+          const isDesktop = window.innerWidth >= 991;
 
-      const rect = textElement.getBoundingClientRect();
-      const heroRect = heroRef.current.getBoundingClientRect();
+          // 如果是手機版，調整定位策略
+          if (!isDesktop) {
+            ghostContainer.style.position = "absolute";
+            ghostContainer.style.left = "0";
+            ghostContainer.style.maxWidth = "calc(100% - 32px)";
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+          } else {
+            // 桌面版原有邏輯
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+          }
 
-      // 添加響應式判斷
-      const isDesktop = window.innerWidth >= 991;
+          // 只在 hero section 可見時更新位置
+          if (heroRect.top <= 0 && heroRect.bottom >= 0) {
+            ghostContainer.style.transform = `translateY(${
+              rect.top - heroRect.top
+            }px) translateX(${rect.left - heroRect.left}px)`;
+            ghostContainer.style.opacity = "1";
+          } else {
+            ghostContainer.style.opacity = "0";
+          }
+        };
 
-      // 如果是手機版，調整定位策略
-    if (!isDesktop) {
-      ghostContainer.style.position = 'absolute';
-      ghostContainer.style.left = '0';
-      ghostContainer.style.maxWidth = 'calc(100% - 32px)';
-      ghostContainer.style.transform = `translateY(${
-        rect.top - heroRect.top
-      }px) translateX(${rect.left - heroRect.left}px)`;
-    } else {
-      // 桌面版原有邏輯
-      ghostContainer.style.transform = `translateY(${
-        rect.top - heroRect.top
-      }px) translateX(${rect.left - heroRect.left}px)`;
+        // 修改 ScrollTrigger 設置
+        const positionTrigger = ScrollTrigger.create({
+          trigger: heroRef.current, // 改為使用 hero section 作為觸發器
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: updateGhostPosition,
+          // 添加 pin 功能，讓 ghost text 在離開 hero section 時停止
+          pin: false,
+          pinSpacing: false,
+        });
+
+        // 初始位置更新
+        updateGhostPosition();
+
+        // 添加 scroll 事件監聽，確保平滑更新
+        window.addEventListener("scroll", () => {
+          requestAnimationFrame(updateGhostPosition);
+        });
+
+        // 清理函數
+        return () => {
+          clearTimeout(initTimer);
+          if (splitTextRef.current) {
+            splitTextRef.current.revert();
+          }
+          scrollTriggersRef.current.forEach((trigger) => trigger.kill());
+          if (ghostRef.current) {
+            ghostRef.current.remove();
+          }
+        };
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        // 清理所有 ScrollTrigger 實例
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+        ScrollTrigger.clearMatchMedia();
+      };
     }
-
-      // 只在 hero section 可見時更新位置
-      if (heroRect.top <= 0 && heroRect.bottom >= 0) {
-        ghostContainer.style.transform = `translateY(${
-          rect.top - heroRect.top
-        }px) translateX(${rect.left - heroRect.left}px)`;
-        ghostContainer.style.opacity = "1";
-      } else {
-        ghostContainer.style.opacity = "0";
-      }
-    };
-
-    // 修改 ScrollTrigger 設置
-    const positionTrigger = ScrollTrigger.create({
-      trigger: heroRef.current, // 改為使用 hero section 作為觸發器
-      start: "top top",
-      end: "bottom bottom",
-      scrub: true,
-      onUpdate: updateGhostPosition,
-      // 添加 pin 功能，讓 ghost text 在離開 hero section 時停止
-      pin: false,
-      pinSpacing: false,
-    });
-
-    // 初始位置更新
-    updateGhostPosition();
-
-    // 添加 scroll 事件監聽，確保平滑更新
-    window.addEventListener("scroll", () => {
-      requestAnimationFrame(updateGhostPosition);
-    });
-
-    // 清理函數
-    return () => {
-      splitText.revert();
-      ghostContainer.remove();
-      positionTrigger.kill();
-      window.removeEventListener("scroll", updateGhostPosition);
-      scrollTriggersRef.current = scrollTriggersRef.current.filter(
-        (trigger) => trigger !== positionTrigger
-      );
-    };
   }, []);
 
   useEffect(() => {
@@ -438,10 +514,64 @@ export default function Hero() {
     }, 2000);
   }, []);
 
+  // 修改初始化動畫的 useEffect
+  useEffect(() => {
+    const handleTransitionComplete = () => {
+      // 重新初始化動畫
+      setTimeout(() => {
+        if (typeof window !== "undefined") {
+          gsap.registerPlugin(ScrollTrigger);
+          // 重新初始化您的動畫邏輯
+          // ...
+        }
+      }, 100);
+    };
+
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
+
+    return () => {
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleHomeNavigation = () => {
+      console.log("Home navigation detected - reinitializing Hero animations");
+      // 重新初始化 Hero 組件的動畫
+      if (typeof window !== "undefined") {
+        gsap.registerPlugin(ScrollTrigger);
+        // 重新初始化您的動畫邏輯
+        // ...
+      }
+    };
+
+    window.addEventListener("homeNavigationComplete", handleHomeNavigation);
+
+    return () => {
+      window.removeEventListener(
+        "homeNavigationComplete",
+        handleHomeNavigation
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    // 添加全局點擊監聽
+    document.addEventListener("click", handleGlobalClick);
+
+    return () => {
+      document.removeEventListener("click", handleGlobalClick);
+    };
+  }, [hoveredKeyword]); // 依賴於 hoveredKeyword 狀態
+
   return (
     <section
       ref={heroRef}
-      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto p-8 pb-20"
+      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:p-8 p-4 pb-20"
     >
       <div className="fixed inset-0 z-10">
         <RiveComp />
@@ -453,7 +583,7 @@ export default function Hero() {
         }`}
       >
         <Image
-          src="/assets/hero-bg.jpg"
+          src="/assets/hero-bg.webp"
           alt="background"
           width={1920}
           height={1080}
@@ -491,55 +621,56 @@ export default function Hero() {
 
       {/* Keyword images */}
       {Object.entries(keywords).map(([keyword, imgSrc]) => (
-  <div
-    key={keyword}
-    className={`fixed inset-0 flex items-center justify-center transition-opacity duration-1000 pointer-events-none ${
-      isLoading
-        ? "opacity-0"
-        : hoveredKeyword === keyword
-        ? "z-40 opacity-100"
-        : "z-[-1] opacity-0"
-    }`}
-  >
-    <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
-      {/* Mosaic overlay */}
-      <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
-        {mosaicTiles.map((tile) => (
-          <div
-            key={tile.id}
-            className="bg-[#adff2f] absolute"
-            style={{
-              width: tile.width,
-              height: tile.height,
-              top: tile.top,
-              left: tile.left,
-              opacity: tile.opacity,
-              backgroundColor: tile.backgroundColor,
-              boxShadow:
-                tile.opacity > 0
-                  ? `0 0 10px ${tile.backgroundColor}, 0 0 20px ${tile.backgroundColor}`
-                  : "none",
-            }}
-          />
-        ))}
-      </div>
-      {/* Keyword image */}
-      <Image
-        src={imgSrc}
-        alt={keyword}
-        width={1920}
-        height={1080}
-        className={`relative z-10 object-cover w-full h-full transition-opacity duration-700 ${
-          showImage && hoveredKeyword === keyword ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          zIndex: hoveredKeyword === keyword && showImage ? 10 : -1,
-        }}
-      />
-    </div>
-  </div>
-))}
-
+        <div
+          key={keyword}
+          className={`fixed inset-0 flex items-center justify-center transition-opacity duration-1000 pointer-events-none ${
+            isLoading
+              ? "opacity-0"
+              : hoveredKeyword === keyword
+              ? "z-40 opacity-100"
+              : "z-[-1] opacity-0"
+          }`}
+        >
+          <div className="relative lg:w-[25vw] h-[60vh] w-[70vw] overflow-hidden">
+            {/* Mosaic overlay */}
+            <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
+              {mosaicTiles.map((tile) => (
+                <div
+                  key={tile.id}
+                  className="bg-[#adff2f] absolute"
+                  style={{
+                    width: tile.width,
+                    height: tile.height,
+                    top: tile.top,
+                    left: tile.left,
+                    opacity: tile.opacity,
+                    backgroundColor: tile.backgroundColor,
+                    boxShadow:
+                      tile.opacity > 0
+                        ? `0 0 10px ${tile.backgroundColor}, 0 0 20px ${tile.backgroundColor}`
+                        : "none",
+                  }}
+                />
+              ))}
+            </div>
+            {/* Keyword image */}
+            <Image
+              src={imgSrc}
+              alt={keyword}
+              width={1920}
+              height={1080}
+              className={`relative z-10 object-cover w-full h-full transition-opacity duration-700 ${
+                showImage && hoveredKeyword === keyword
+                  ? "opacity-100"
+                  : "opacity-0"
+              }`}
+              style={{
+                zIndex: hoveredKeyword === keyword && showImage ? 10 : -1,
+              }}
+            />
+          </div>
+        </div>
+      ))}
 
       {/* Main text content */}
       <div
@@ -598,23 +729,27 @@ export default function Hero() {
             <br />
             <span
               className={`keyword-highlight cursor-pointer text-[#adff2f] transition-opacity duration-300 ease-out ${
-                hoveredKeyword === "LOW/NO CODE SOLUTIONS"
+                hoveredKeyword === "LOW CODE SOLUTIONS"
                   ? "text-shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_30px_#adff2f]"
                   : ""
               } lg:hover:text-shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_30px_#adff2f]`}
-              onClick={() => handleKeywordClick("LOW/NO CODE SOLUTIONS")}
+              onClick={() => handleKeywordClick("LOW CODE SOLUTIONS")}
               onMouseEnter={() =>
                 window.innerWidth >= 1024 &&
-                handleMouseEnter("LOW/NO CODE SOLUTIONS")
+                handleMouseEnter("LOW CODE SOLUTIONS")
               }
               onMouseLeave={() =>
                 window.innerWidth >= 1024 && handleMouseLeave()
               }
             >
-              LOW/NO CODE SOLUTIONS
+              LOW CODE SOLUTIONS
             </span>
             .
           </h1>
+          <div className="flex flex-row gap-4 items-center">
+            <div className="solid-blink w-4 h-4 bg-lime-300 shadow-[0_0_10px_#adff2f,0_0_20px_#adff2f,0_0_10px_#adff2f]"></div>
+            <p className="text-lg">Based in Taipei</p>
+          </div>
         </div>
       </div>
     </section>
