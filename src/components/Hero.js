@@ -599,9 +599,8 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:p-8 p-4 pb-20"
+      className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:px-8 p-4 pb-20"
     >
-      <div className="h-[60vh]"></div>
       <div className="fixed inset-0 z-10">
         <RiveComp />
       </div>
@@ -611,7 +610,7 @@ export default function Hero() {
           showBackground ? "opacity-100 " : "opacity-0"
         }`}
       >
-        <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
+        <div className="relative md:h-[60vh] md:w-auto h-auto w-[70vw] aspect-[3/4] overflow-hidden">
           <Image
             src="/assets/hero-bg.webp"
             alt="background"
@@ -634,7 +633,7 @@ export default function Hero() {
               : "z-[-1] opacity-0"
           }`}
         >
-          <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
+          <div className="relative md:h-[60vh] md:w-auto h-auto w-[70vw] aspect-[3/4] overflow-hidden">
             {/* Mosaic overlay */}
             <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none z-40">
               {mosaicTiles.map((tile) => (
@@ -678,7 +677,7 @@ export default function Hero() {
       {/* Loading mosaic overlay */}
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="relative h-[60vh] aspect-[3/4] overflow-hidden">
+          <div className="relative md:h-[60vh] md:w-auto h-auto w-[70vw] aspect-[3/4] overflow-hidden">
             <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
               {loadingMosaicTiles.map((tile) => (
                 <div
