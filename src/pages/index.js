@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Hero from "@/components/Hero";
 import ContentfulSection from "@/components/ContentfulSection";
+import FeaturedWorks from "@/components/FeaturedWorks";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
 
@@ -117,7 +118,7 @@ export default function Home() {
         >
           <h2 className="text-2xl font-bold text-white mb-8">Spotlight on</h2>
           <div>
-            <ContentfulSection />
+            <FeaturedWorks />
           </div>
         </section>
       </main>

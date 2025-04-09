@@ -601,7 +601,7 @@ export default function Hero() {
       ref={heroRef}
       className="w-full h-[300vh] flex flex-col items-center max-w-[100rem] pt-[50vh] relative mx-auto md:px-8 p-4 pb-20"
     >
-      <div className="fixed inset-0 z-10">
+      <div className="fixed inset-0 z-10 h-[100vh]">
         <RiveComp />
       </div>
       {/* Background image */}
