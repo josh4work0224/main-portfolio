@@ -3,7 +3,7 @@ import Image from "next/image";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS, INLINES } from "@contentful/rich-text-types";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { useRouter } from "next/router";
@@ -16,6 +16,7 @@ import Footer from "@/components/Footer";
 import React from "react";
 import PixelatedImage from "@/components/PixelatedImage";
 import NextButton from "@/components/nextBttoun";
+import DetailImageSlider from "@/components/DetailGallery";
 
 // getStaticPaths remains the same
 export async function getStaticPaths() {
@@ -143,13 +144,32 @@ const WorkDetail = ({ work }) => {
   const router = useRouter();
   const [index, setIndex] = useState(-1);
 
-  const slides =
-    work?.fields?.imageGallery?.map((image) => ({
+  // 提取所有需要在 Lightbox 中显示的图片
+  const allImages = useMemo(() => {
+    const mainImages = work?.fields?.imageGallery || [];
+    const detailImages = work?.fields?.detailImages || []; // 假设您有一个名为 detailImages 的字段用于轮播图
+
+    // 组合所有图片，先是主要展示的图片，然后是详细图片
+    return [...mainImages, ...detailImages];
+  }, [work?.fields?.imageGallery, work?.fields?.detailImages]);
+
+  // 创建 Lightbox 所需的幻灯片数据
+  const slides = useMemo(() => {
+    return allImages.map((image) => ({
       src: `https:${image.fields.file.url}`,
       alt: image.fields.file.title || "Gallery image",
       width: 1920,
       height: 1080,
-    })) || [];
+    }));
+  }, [allImages]);
+
+  // 处理详细图片点击，传入对应的索引偏移量
+  const handleDetailImageClick = (detailIndex) => {
+    // 主要展示图片的数量
+    const mainImagesCount = work?.fields?.imageGallery?.length || 0;
+    // 详细图片在 Lightbox 中的起始索引应该是主要图片之后
+    setIndex(mainImagesCount + detailIndex);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -551,17 +571,31 @@ const WorkDetail = ({ work }) => {
                 <div className="absolute w-2 h-2 group-hover:h-4 bg-lime-300 right-0 top-0"></div>
               </div>
             </div>
-            <div className="h-full relative col-span-4 col-start-5">
-              <div className="flex flex-col sticky top-[30vh]">
-                <span className="px-[2px] py-[1px] mb-4 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
-                  Results
-                </span>
-                {work.fields.results &&
-                  documentToReactComponents(
-                    work.fields.results,
-                    richTextOptions
-                  )}
-              </div>
+            <div className="col-span-4 col-start-5 flex flex-col self-end lg:order-1 order-2">
+              <span className="px-[2px] py-[1px] mb-4 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]">
+                Results
+              </span>
+              {work.fields.results &&
+                documentToReactComponents(work.fields.results, richTextOptions)}
+            </div>
+          </div>
+          <div className="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-32 pt-0">
+            <div className="col-span-8">
+              {/* 添加详细图片滑动组件 */}
+              {work?.fields?.detailImages &&
+              work.fields.detailImages.length > 0 ? (
+                <DetailImageSlider
+                  images={work.fields.detailImages}
+                  onImageClick={handleDetailImageClick}
+                />
+              ) : work?.fields?.imageGallery &&
+                work.fields.imageGallery.length > 5 ? (
+                // 如果没有专门的 detailImages 字段，可以使用 imageGallery 中未在页面上显示的图片
+                <DetailImageSlider
+                  images={work.fields.imageGallery.slice(5)}
+                  onImageClick={(i) => setIndex(5 + i)}
+                />
+              ) : null}
             </div>
           </div>
           <div className="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-32 pt-0">

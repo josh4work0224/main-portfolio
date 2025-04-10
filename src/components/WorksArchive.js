@@ -265,7 +265,7 @@ const WorksArchive = ({ initialWorks }) => {
 
       <div
         ref={gridRef}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
       >
         {sortedWorks.map((work, idx) => (
           <Link
@@ -308,7 +308,7 @@ const WorksArchive = ({ initialWorks }) => {
                           ${
                             isMobile || isTablet
                               ? "scale-100"
-                              : "scale-0 group-hover:scale-100 transition-transform duration-500"
+                              : "scale-y-0 group-hover:scale-y-100 transition-transform duration-500"
                           }`}
                         ref={(el) => {
                           if (!animationRefs.current[idx]) {
