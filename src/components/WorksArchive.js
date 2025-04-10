@@ -9,15 +9,35 @@ import { useRouter } from "next/router";
 const WorksArchive = ({ initialWorks }) => {
   const [works, setWorks] = useState(initialWorks || []);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const gridRef = useRef(null);
   const [pageKey, setPageKey] = useState(0);
   const router = useRouter();
   const isTransitioning = useRef(false);
   const pendingSortChange = useRef(null);
+  const animationRefs = useRef({});
 
   // 添加一個 ref 來追踪 ScrollTrigger 實例
   const scrollTriggers = useRef([]);
   const shouldPreserveAnimations = useRef(false);
+
+  // 檢查裝置尺寸 - 設置響應式
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+    };
+  }, []);
 
   useEffect(() => {
     if (initialWorks?.length > 0) return;
@@ -138,6 +158,19 @@ const WorksArchive = ({ initialWorks }) => {
           scrollTriggers.current.push(tl.scrollTrigger);
         });
       });
+
+      // 初始化 hover 動畫元素
+      cards.forEach((card, index) => {
+        const animateElement = card.querySelector(".work-animate");
+        if (animateElement) {
+          // 在桌面版設為隱藏(等待hover)，在平板和手機版直接顯示
+          if (!isMobile && !isTablet) {
+            gsap.set(animateElement, { scale: 0 });
+          } else {
+            gsap.set(animateElement, { scale: 1 });
+          }
+        }
+      });
     };
 
     // 添加視窗大小改變的監聽器
@@ -194,7 +227,7 @@ const WorksArchive = ({ initialWorks }) => {
       }
       window.removeEventListener("resize", handleResize);
     };
-  }, [works, sortOrder, pageKey]);
+  }, [works, sortOrder, pageKey, isMobile, isTablet]);
 
   const handleSortChange = () => {
     if (isTransitioning.current) {
@@ -234,46 +267,86 @@ const WorksArchive = ({ initialWorks }) => {
         ref={gridRef}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        {sortedWorks.map((work) => (
+        {sortedWorks.map((work, idx) => (
           <Link
             href={`/works/${work.fields.slug}`}
             key={work.sys.id}
-            className="block group relative work-card"
+            className="work-card block group bg-black"
             scroll={false}
           >
-            <div className="border border-white/10 p-6 h-[300px] relative overflow-hidden">
-              {work.fields.animate?.fields?.file?.url && (
-                <div className="absolute inset-0 lg:opacity-0 lg:group-hover:opacity-20 opacity-20 transition-opacity duration-500">
-                  <Image
-                    src={`https:${work.fields.animate.fields.file.url}`}
-                    alt={work.fields.animate.fields.file.title || "Animation"}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+            <div className="block group rounded-[2px]">
+              <div className="overflow-hidden relative w-full aspect-square flex flex-col">
+                <div className="w-full h-full">
+                  {work.fields.mainImage?.fields?.file?.url && (
+                    <Image
+                      src={`https:${work.fields.mainImage.fields.file.url}`}
+                      alt={work.fields.name || "Work image"}
+                      fill
+                      className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                    />
+                  )}
+                  <div
+                    className={`absolute w-full h-full p-4 flex flex-col tracking-wide transition-all duration-300
+                      ${
+                        isMobile || isTablet
+                          ? "bg-black/[0.75]"
+                          : "bg-slate-800/[0.25] hover:bg-black/[0.75]"
+                      }`}
+                  >
+                    <div className="flex flex-row relative w-full justify-between">
+                      <h3 className="text-2xl text-white font-medium self-center z-[50]">
+                        {work.fields.client}
+                      </h3>
+                      <h3 className="text-2xl text-white font-medium self-center z-[50]">
+                        {new Date(work.fields.publishDate).getFullYear()}
+                      </h3>
+                    </div>
 
-              <div className="relative z-10 h-full flex flex-col justify-between">
-                <h2 className="text-5xl font-light text-white group-hover:translate-x-2 transition-transform duration-300">
-                  {work.fields.client}
-                </h2>
+                    <div className="w-full grow flex flex-cols">
+                      <div
+                        className={`w-[70%] mx-auto aspect-video relative z-40 overflow-hidden self-center
+                          ${
+                            isMobile || isTablet
+                              ? "scale-100"
+                              : "scale-0 group-hover:scale-100 transition-transform duration-500"
+                          }`}
+                        ref={(el) => {
+                          if (!animationRefs.current[idx]) {
+                            animationRefs.current[idx] = {};
+                          }
+                          animationRefs.current[idx].workAnimate = el;
+                        }}
+                      >
+                        {work.fields.animate?.fields?.file?.url && (
+                          <Image
+                            src={`https:${work.fields.animate.fields.file.url}`}
+                            alt={
+                              work.fields.animate.fields.file.title ||
+                              "Gallery image"
+                            }
+                            width={1920}
+                            height={1080}
+                            className="object-cover w-full h-full"
+                          />
+                        )}
+                      </div>
+                    </div>
 
-                <div className="flex justify-between items-end">
-                  <div className="flex flex-wrap max-w-[80%] gap-2">
-                    {Array.isArray(work.fields.type) &&
-                      work.fields.type.map((categoryRef) => (
-                        <span
-                          key={categoryRef.sys.id}
-                          className="px-[2px] py-[1px] bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]"
-                        >
-                          {categoryRef.fields?.tagName || "Unnamed Category"}
-                        </span>
-                      ))}
+                    <div className="flex flex-row pb-3 pt-1">
+                      {Array.isArray(work.fields.type) &&
+                        work.fields.type.map((categoryRef) => (
+                          <div
+                            key={categoryRef.sys.id}
+                            className="px-[2px] py-[1px] mr-2 bg-white text-slate-700 text-md leading-none uppercase self-start rounded-[2px]"
+                          >
+                            <h4>
+                              {categoryRef.fields?.tagName ||
+                                "Unnamed Category"}
+                            </h4>
+                          </div>
+                        ))}
+                    </div>
                   </div>
-
-                  <span className="text-white text-2xl transform translate-x-0 group-hover:translate-x-2 transition-transform duration-300">
-                    →
-                  </span>
                 </div>
               </div>
             </div>

@@ -182,7 +182,7 @@ const WorkSlider = ({ works }) => {
     });
 
     // 顯示當前焦點項目的動畫
-    const focusedIdx = currentIndex + 1;
+    const focusedIdx = isMobile || isTablet ? currentIndex : currentIndex + 1;
     const elements = animationRefs.current[focusedIdx];
 
     if (elements && elements.workAnimate) {
@@ -202,7 +202,11 @@ const WorkSlider = ({ works }) => {
 
   // 檢查項目是否為當前焦點
   const isFocused = (idx) => {
-    return idx === currentIndex + 1;
+    if (isMobile || isTablet) {
+      return idx === currentIndex;
+    } else {
+      return idx === currentIndex + 1;
+    }
   };
 
   return (
@@ -222,7 +226,7 @@ const WorkSlider = ({ works }) => {
               <Link
                 href={`/works/${work.fields.slug}`}
                 scroll={false}
-                className="work-item block bg-black"
+                className="work-item block bg-black border border-white/10"
               >
                 <div className="block group rounded-[2px]">
                   <div className="overflow-hidden relative w-full aspect-[2/3] flex flex-col">
@@ -236,7 +240,7 @@ const WorkSlider = ({ works }) => {
                         />
                       )}
                       <div
-                        className={`absolute w-full h-full p-4 flex flex-col uppercase tracking-wide transition-all duration-300
+                        className={`absolute w-full h-full p-4 flex flex-col tracking-wide transition-all duration-300
                           ${
                             (isMobile || isTablet) && focused
                               ? "bg-black/[0.75]"
@@ -309,14 +313,14 @@ const WorkSlider = ({ works }) => {
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/40 text-white p-6 rounded-full transition-colors"
+            className="absolute left-12 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/40 text-white p-6 rounded-full transition-colors"
             disabled={isAnimating}
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/40 text-white p-6 rounded-full transition-colors"
+            className="absolute right-12 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/40 text-white p-6 rounded-full transition-colors"
             disabled={isAnimating}
           >
             →
