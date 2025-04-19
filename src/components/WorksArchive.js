@@ -5,7 +5,6 @@ import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { useRouter } from "next/router";
-
 const WorksArchive = ({ initialWorks }) => {
   const [works, setWorks] = useState(initialWorks || []);
   const [sortOrder, setSortOrder] = useState("newest");
@@ -17,31 +16,24 @@ const WorksArchive = ({ initialWorks }) => {
   const isTransitioning = useRef(false);
   const pendingSortChange = useRef(null);
   const animationRefs = useRef({});
-
   // 添加一個 ref 來追踪 ScrollTrigger 實例
   const scrollTriggers = useRef([]);
   const shouldPreserveAnimations = useRef(false);
-
   // 檢查裝置尺寸 - 設置響應式
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     const checkDevice = () => {
       setIsMobile(window.innerWidth < 768);
       setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
     };
-
     checkDevice();
     window.addEventListener("resize", checkDevice);
-
     return () => {
       window.removeEventListener("resize", checkDevice);
     };
   }, []);
-
   useEffect(() => {
     if (initialWorks?.length > 0) return;
-
     if (
       !process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID ||
       !process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN
@@ -49,12 +41,10 @@ const WorksArchive = ({ initialWorks }) => {
       console.error("環境變數未正確設置");
       return;
     }
-
     const client = createClient({
       space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID,
       accessToken: process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN,
     });
-
     client
       .getEntries({
         content_type: "works",
@@ -72,13 +62,10 @@ const WorksArchive = ({ initialWorks }) => {
       })
       .catch(console.error);
   }, [initialWorks]);
-
   // 修改動畫初始化邏輯
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     gsap.registerPlugin(ScrollTrigger);
-
     // 根據不同斷點定義列數和偏移量
     const getColumnConfig = () => {
       const width = window.innerWidth;
@@ -112,30 +99,23 @@ const WorksArchive = ({ initialWorks }) => {
         };
       }
     };
-
     const initAnimation = () => {
       console.log("Initializing WorksArchive animations");
-
       const cards = gridRef.current?.querySelectorAll(".work-card");
       if (!cards?.length) return;
-
       // 清理之前的動畫
       scrollTriggers.current.forEach((st) => st.kill());
       scrollTriggers.current = [];
-
       const { columns, offsets } = getColumnConfig();
-
       cards.forEach((card, index) => {
         const columnIndex = index % columns;
         const { start } = offsets[columnIndex];
         gsap.set(card, { y: start });
       });
-
       requestAnimationFrame(() => {
         cards.forEach((card, index) => {
           const columnIndex = index % columns;
           const { start, end } = offsets[columnIndex];
-
           const tl = gsap.fromTo(
             card,
             { y: start },
@@ -153,12 +133,10 @@ const WorksArchive = ({ initialWorks }) => {
               },
             }
           );
-
           // 保存 ScrollTrigger 實例以便後續清理
           scrollTriggers.current.push(tl.scrollTrigger);
         });
       });
-
       // 初始化 hover 動畫元素
       cards.forEach((card, index) => {
         const animateElement = card.querySelector(".work-animate");
@@ -172,45 +150,46 @@ const WorksArchive = ({ initialWorks }) => {
         }
       });
     };
-
     // 添加視窗大小改變的監聽器
     const handleResize = () => {
       initAnimation();
     };
-
     window.addEventListener("resize", handleResize);
-
     // 路由變化處理
     const handleRouteChangeStart = () => {
       isTransitioning.current = true;
       // 不要在這裡清理動畫
     };
-
     const handleRouteChangeComplete = () => {
       isTransitioning.current = false;
       if (pendingSortChange.current !== null) {
         setSortOrder(pendingSortChange.current);
         pendingSortChange.current = null;
       }
-      // 只在路由變化完成時初始化動畫
+    };
+    // Transition 完成後的處理
+    const handleTransitionComplete = () => {
+      console.log("Page transition complete - reinitializing animations");
       setTimeout(() => {
         setPageKey((prev) => prev + 1);
         initAnimation();
       }, 100);
     };
-
     if (document.readyState === "complete") {
       initAnimation();
     } else {
       window.addEventListener("load", initAnimation);
     }
-
     router.events.on("routeChangeStart", handleRouteChangeStart);
     router.events.on("routeChangeComplete", handleRouteChangeComplete);
-
+    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
+      window.removeEventListener(
+        "pageTransitionComplete",
+        handleTransitionComplete
+      );
       window.removeEventListener("load", initAnimation);
       // 只在組件完全卸載時清理
       if (!isTransitioning.current) {
@@ -219,18 +198,15 @@ const WorksArchive = ({ initialWorks }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, [works, sortOrder, pageKey, isMobile, isTablet]);
-
   const handleSortChange = () => {
     if (isTransitioning.current) {
       // 如果正在轉場中，將排序變更儲存起來
       pendingSortChange.current = sortOrder === "newest" ? "oldest" : "newest";
       return;
     }
-
     // 否則直接更新排序
     setSortOrder(sortOrder === "newest" ? "oldest" : "newest");
   };
-
   const sortedWorks = [...works].sort((a, b) => {
     if (sortOrder === "newest") {
       return new Date(b.fields.publishDate) - new Date(a.fields.publishDate);
@@ -238,7 +214,6 @@ const WorksArchive = ({ initialWorks }) => {
       return new Date(a.fields.publishDate) - new Date(b.fields.publishDate);
     }
   });
-
   return (
     <section
       className="mt-[8rem] relative z-[95] bg-black w-full"
@@ -253,7 +228,6 @@ const WorksArchive = ({ initialWorks }) => {
           <span className="text-sm">↑↓</span>
         </button>
       </div>
-
       <div
         ref={gridRef}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
@@ -292,7 +266,6 @@ const WorksArchive = ({ initialWorks }) => {
                         {new Date(work.fields.publishDate).getFullYear()}
                       </h3>
                     </div>
-
                     <div className="w-full grow flex flex-cols">
                       <div
                         className={`w-[70%] mx-auto aspect-video relative z-40 overflow-hidden self-center
@@ -322,7 +295,6 @@ const WorksArchive = ({ initialWorks }) => {
                         )}
                       </div>
                     </div>
-
                     <div className="flex flex-row pb-3 pt-1">
                       {Array.isArray(work.fields.type) &&
                         work.fields.type.map((categoryRef) => (
@@ -347,5 +319,4 @@ const WorksArchive = ({ initialWorks }) => {
     </section>
   );
 };
-
 export default WorksArchive;
