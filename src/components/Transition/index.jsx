@@ -54,8 +54,9 @@ export default function Transition({ children }) {
     const width = windowSize.width;
     const height = windowSize.height;
 
-    const gridCols = Math.floor(width / baseSize);
-    const gridRows = Math.floor(height / baseSize);
+    // 確保網格大小能夠完全覆蓋
+    const gridCols = Math.ceil(width / baseSize) + 1;
+    const gridRows = Math.ceil(height / baseSize) + 1;
 
     return {
       rows: Math.max(10, Math.min(gridRows, 20)), // 最小 10 行，最大 20 行
@@ -65,8 +66,8 @@ export default function Transition({ children }) {
 
   const createMosaicTiles = () => {
     const { rows: gridRows, cols: gridCols } = calculateGridSize();
-    const blockWidth = 100 / gridCols;
-    const blockHeight = 100 / gridRows;
+    const blockWidth = 100 / (gridCols - 1);
+    const blockHeight = 100 / (gridRows - 1);
 
     let tiles = [];
     const totalTiles = gridRows * gridCols;
@@ -82,6 +83,7 @@ export default function Transition({ children }) {
         left: `${col * blockWidth}%`,
         display: "none",
         backgroundColor: "#adff2f",
+        transform: "translate3d(0, 0, 0)",
       });
     }
 
@@ -149,7 +151,8 @@ export default function Transition({ children }) {
         // 等待新頁面內容加載
         await new Promise((resolve) => {
           setDisplayChildren(children);
-          resolve();
+          // 給新頁面內容一些時間來初始化
+          setTimeout(resolve, 100);
         });
 
         // Logo 顯示動畫
@@ -174,10 +177,8 @@ export default function Transition({ children }) {
             },
             onUpdate: () => setMosaicTiles([...tiles]),
             onComplete: () => {
-              setTimeout(() => {
-                window.dispatchEvent(new Event("pageTransitionComplete"));
-                resolve();
-              }, ANIMATION_PARAMS.EXIT_DELAY);
+              // 移除 pageTransitionComplete 事件的觸發
+              resolve();
             },
           });
         });
@@ -245,10 +246,7 @@ export default function Transition({ children }) {
                 left: tile.left,
                 display: tile.display,
                 backgroundColor: tile.backgroundColor,
-                boxShadow:
-                  tile.display === "block"
-                    ? "0 0 10px #adff2f, 0 0 20px #adff2f"
-                    : "none",
+                transform: tile.transform,
               }}
             />
           ))}

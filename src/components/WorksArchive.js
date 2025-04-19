@@ -192,11 +192,7 @@ const WorksArchive = ({ initialWorks }) => {
         setSortOrder(pendingSortChange.current);
         pendingSortChange.current = null;
       }
-    };
-
-    // Transition 完成後的處理
-    const handleTransitionComplete = () => {
-      console.log("Page transition complete - reinitializing animations");
+      // 只在路由變化完成時初始化動畫
       setTimeout(() => {
         setPageKey((prev) => prev + 1);
         initAnimation();
@@ -211,15 +207,10 @@ const WorksArchive = ({ initialWorks }) => {
 
     router.events.on("routeChangeStart", handleRouteChangeStart);
     router.events.on("routeChangeComplete", handleRouteChangeComplete);
-    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
-      window.removeEventListener(
-        "pageTransitionComplete",
-        handleTransitionComplete
-      );
       window.removeEventListener("load", initAnimation);
       // 只在組件完全卸載時清理
       if (!isTransitioning.current) {

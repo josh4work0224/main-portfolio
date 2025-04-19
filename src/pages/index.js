@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import Hero from "@/components/Hero";
+import Hero from "@/components/HeroParticle";
 import ContentfulSection from "@/components/ContentfulSection";
 import FeaturedWorks from "@/components/FeaturedWorks";
 import Footer from "@/components/Footer";

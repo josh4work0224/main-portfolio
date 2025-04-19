@@ -101,23 +101,11 @@ const ContentfulSection = () => {
     };
   }, [works]);
 
-  // Listen for transition completion
+  // Remove the transition complete listener since we don't need to reinitialize
+  // on every transition
   useEffect(() => {
-    const handleTransitionComplete = () => {
-      console.log("Page transition complete - reinitializing animations");
-      setTimeout(() => {
-        setRemountKey((prev) => prev + 1);
-        initializeAnimations();
-      }, 100);
-    };
-
-    window.addEventListener("pageTransitionComplete", handleTransitionComplete);
-
     return () => {
-      window.removeEventListener(
-        "pageTransitionComplete",
-        handleTransitionComplete
-      );
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
