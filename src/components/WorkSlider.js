@@ -218,7 +218,7 @@ const WorkSlider = ({ works }) => {
           return (
             <div
               key={`${work.sys.id}-${idx}`}
-              className={`flex-shrink-0 pr-8 transition-transform duration-300 ${
+              className={`flex-shrink-0 lg:pr-8 px-4 transition-transform duration-300 ${
                 focused ? "z-10" : "opacity-85"
               }`}
               style={{ width: `${100 / visibleItems}%` }}
@@ -313,14 +313,14 @@ const WorkSlider = ({ works }) => {
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-10"
+            className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-999"
             disabled={isAnimating}
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-10 "
+            className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-999"
             disabled={isAnimating}
           >
             →
