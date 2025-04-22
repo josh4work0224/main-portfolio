@@ -16,7 +16,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto"
+      className="w-full lg:h-screen h-[100dvh] flex flex-col items-center justify-center relative mx-auto"
     >
       <div className="fixed inset-0 z-10">
         <LogoParticles particleSize={1} particleAmount={5000} />
@@ -35,12 +35,12 @@ export default function Hero() {
           mixBlendMode="difference"
         />
       </h1>
-      <div className="flex flex-row max-w-[40rem] w-full p-8 justify-between fixed bottom-[2rem]">
+      <div className="flex flex-row max-w-[40rem] w-full p-8 justify-between fixed bottom-[2rem] gap-2 text-center">
         <h2>UI/UX Designer</h2>
         <h2>Web Designer</h2>
         <h2>Low code Developer</h2>
       </div>
-      <div className="flex flex-row w-auto p-2 gap-4 items-center justify-between fixed top-[4rem] left-[2rem] border border-gray-100/45">
+      <div className="flex flex-row w-auto p-2 gap-4 items-center justify-between fixed top-[4rem] lg:left-[2rem] left-[1rem] border border-gray-100/45">
         <div className="flex flex-col">
           <span>Based in Taipei</span>
           <TimeDisplay />
