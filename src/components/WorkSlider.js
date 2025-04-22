@@ -164,7 +164,7 @@ const WorkSlider = ({ works }) => {
     // 執行滑動動畫
     gsap.to(sliderRef.current, {
       xPercent: -slidePercentage * currentIndex,
-      duration: 0.5,
+      duration: 0.75,
       ease: "power2.inOut",
       onComplete: resetPosition, // 動畫完成後檢查是否需要重置位置
     });
@@ -219,7 +219,7 @@ const WorkSlider = ({ works }) => {
             <div
               key={`${work.sys.id}-${idx}`}
               className={`flex-shrink-0 lg:pr-8 px-4 transition-transform duration-300 ${
-                focused ? "z-10" : "opacity-85"
+                focused ? "z-5" : "opacity-85"
               }`}
               style={{ width: `${100 / visibleItems}%` }}
             >
@@ -313,14 +313,14 @@ const WorkSlider = ({ works }) => {
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-999"
+            className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-20"
             disabled={isAnimating}
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-999"
+            className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-20"
             disabled={isAnimating}
           >
             →
