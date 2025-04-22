@@ -93,8 +93,11 @@ export default function Home() {
         gsap.registerPlugin(ScrollTrigger);
       }
 
-      console.log("Initial load: Setting up ScrollTrigger");
-      initializeScrollTrigger();
+      // 使用 setTimeout 確保 DOM 完全渲染
+      setTimeout(() => {
+        console.log("Initial load: Setting up ScrollTrigger");
+        initializeScrollTrigger();
+      }, 100);
     }
 
     return () => {
@@ -106,7 +109,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen" key={pageKey}>
       <main className="flex-grow">
         <div
-          className={`transition-all duration-300 ${
+          className={`transition-all duration-300 fixed w-full ${
             isWorksVisible ? "blur-sm" : ""
           }`}
         >
@@ -114,7 +117,7 @@ export default function Home() {
         </div>
         <section
           ref={worksRef}
-          className="lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-gray-100/45"
+          className="lg:px-8 px-4 py-8 relative z-[95] bg-black w-full border-t border-gray-100/45 mt-[100vh]"
         >
           <h2 className="text-2xl font-bold text-white mb-8">Spotlight on</h2>
           <div>
