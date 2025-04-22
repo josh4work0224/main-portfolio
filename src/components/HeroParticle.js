@@ -36,7 +36,10 @@ export default function Hero() {
       style={{ height: `calc(${viewportHeight} * 100)` }}
       className="w-full flex flex-col items-center justify-center relative mx-auto overflow-hidden"
     >
-      <div className="fixed inset-0 z-10" style="height:100dvh">
+      <div
+        className="fixed inset-0 z-10 flex flex-col items-center"
+        style={{ height: `calc(${viewportHeight} * 100)` }}
+      >
         <LogoParticles particleSize={1} particleAmount={5000} />
       </div>
       {/* 使用 DecryptedText 组件显示名字 */}
