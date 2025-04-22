@@ -16,9 +16,9 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto lg:-translate-y-0 -translate-y-[10vh]"
+      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto"
     >
-      <div className="fixed inset-0 z-10">
+      <div className="fixed inset-0 z-10 lg:-translate-y-0 -translate-y-[10vh]">
         <LogoParticles particleSize={1} particleAmount={5000} />
       </div>
       {/* 使用 DecryptedText 组件显示名字 */}
