@@ -16,7 +16,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto"
+      className="w-full min-h-screen flex flex-col items-center justify-center relative mx-auto overflow-hidden"
     >
       <div className="fixed inset-0 z-10">
         <LogoParticles particleSize={1} particleAmount={5000} />
