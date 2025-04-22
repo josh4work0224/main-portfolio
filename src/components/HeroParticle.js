@@ -16,13 +16,13 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto"
+      className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto lg:-translate-y-0 -translate-y-[10vh]"
     >
       <div className="fixed inset-0 z-10">
         <LogoParticles particleSize={1} particleAmount={5000} />
       </div>
       {/* 使用 DecryptedText 组件显示名字 */}
-      <h1 className="font-display leading-none mix-blend-difference">
+      <h1 className="font-display leading-none mix-blend-difference lg:-translate-y-0 -translate-y-[10vh]">
         <DecryptedText
           text={name}
           speed={50}
