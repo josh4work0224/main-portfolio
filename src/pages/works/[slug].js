@@ -269,7 +269,15 @@ const WorkDetail = ({ work }) => {
       window.removeEventListener("load", initAnimation);
       ScrollTrigger.getAll().forEach((st) => st.kill());
     };
-  }, []); // 移除 router 依賴，因為我們現在使用事件來處理頁面變化
+  }, []); // 移除 router.asPath 依賴，只在組件掛載和收到 pageTransitionComplete 事件時初始化
+
+  // 添加一個額外的 useEffect 來在組件卸載時清理 ScrollTrigger 實例
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounting, cleaning up ScrollTrigger");
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
+  }, []);
 
   if (!work) return <div>Loading...</div>;
   return (
@@ -579,7 +587,7 @@ const WorkDetail = ({ work }) => {
                 documentToReactComponents(work.fields.results, richTextOptions)}
             </div>
           </div>
-          <div className="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-32 pt-0">
+          <div className="lg:grid lg:grid-cols-8 flex flex-col gap-x-8 pb-8 pt-0">
             <div className="col-span-8">
               {/* 添加详细图片滑动组件 */}
               {work?.fields?.detailImages &&

@@ -155,6 +155,9 @@ export default function Transition({ children }) {
           setTimeout(resolve, 100);
         });
 
+        // 在這裡重置滾動位置，確保在 mosaic 動畫完全進入後
+        window.scrollTo(0, 0);
+
         // Logo 顯示動畫
         if (shouldShowLogo(router.asPath)) {
           setShowLogo(true);
@@ -164,8 +167,10 @@ export default function Transition({ children }) {
         }
 
         // 退場動畫
-        window.scrollTo(0, 0);
         setShowLogo(false);
+
+        // 觸發頁面轉場完成事件，讓新頁面初始化 ScrollTrigger
+        window.dispatchEvent(new Event("pageTransitionComplete"));
 
         await new Promise((resolve) => {
           gsap.to(tiles, {
@@ -177,7 +182,6 @@ export default function Transition({ children }) {
             },
             onUpdate: () => setMosaicTiles([...tiles]),
             onComplete: () => {
-              // 移除 pageTransitionComplete 事件的觸發
               resolve();
             },
           });
