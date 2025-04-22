@@ -1,10 +1,27 @@
 // LogoParticles.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 
 const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 初始化移动设备检测
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 991);
+    };
+
+    // 初始检查
+    checkMobile();
+
+    // 添加resize监听器
+    window.addEventListener("resize", checkMobile);
+
+    // 清理函数
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // 组件挂载后初始化Three.js
   useEffect(() => {
@@ -57,12 +74,12 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
 
       // 创建相机
       camera = new THREE.PerspectiveCamera(
-        65,
+        isMobile ? 75 : 65, // 移动设备使用更大的FOV
         containerRef.current.clientWidth / containerRef.current.clientHeight,
         1,
         10000
       );
-      camera.position.set(0, 0, 100);
+      camera.position.set(0, 0, isMobile ? 80 : 100); // 移动设备使用更近的相机位置
 
       // 创建渲染器
       renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -258,14 +275,14 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
 
       // 设置缩放比例以适应屏幕
       // 减小scale值可以让logo更大
-      const scale = 8; // 从20改为8，使logo更大
+      const scale = isMobile ? 6 : 8; // 移动设备使用更小的scale值
       const scaleFactor =
         (Math.min(
           window.innerWidth / svgWidth,
           window.innerHeight / svgHeight
         ) *
-          0.6) /
-        scale; // 从0.8改为0.6，调整整体大小
+          (isMobile ? 0.7 : 0.6)) / // 移动设备使用更大的缩放系数
+        scale;
 
       // 从路径中获取点
       svgPaths.forEach((path) => {
@@ -408,7 +425,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
       return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
-    // 辅助函数 - 窗口大小调整处理，定义在闭包外部以便清理时使用
+    // 辅助函数 - 窗口大小调整处理
     const onWindowResize = () => {
       if (camera && renderer && containerRef.current) {
         camera.aspect =
@@ -478,7 +495,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
         }
       }
     };
-  }, [particleSize, particleAmount]);
+  }, [particleSize, particleAmount, isMobile]);
 
   return (
     <div
