@@ -9,6 +9,23 @@ import TimeDisplay from "./TimeDisplay";
 export default function Hero() {
   const heroRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewportHeight, setViewportHeight] = useState("100vh");
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      setViewportHeight(`${vh}px`);
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    };
+  }, []);
 
   // 你的名字
   const name = "I'm SHENG CHI";
@@ -16,7 +33,8 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="w-full min-h-screen flex flex-col items-center justify-center relative mx-auto overflow-hidden"
+      style={{ height: `calc(${viewportHeight} * 100)` }}
+      className="w-full flex flex-col items-center justify-center relative mx-auto overflow-hidden"
     >
       <div className="fixed inset-0 z-10">
         <LogoParticles particleSize={1} particleAmount={5000} />

@@ -260,7 +260,7 @@ const WorkSlider = ({ works }) => {
                             className={`w-[70%] mx-auto aspect-video relative z-40 overflow-hidden self-center
                               ${
                                 isMobile || isTablet
-                                  ? "work-animate scale-y-100"
+                                  ? "work-animate scale-y-0"
                                   : "scale-y-0 group-hover:scale-100 transition-transform duration-500"
                               }`}
                             ref={(el) => {
