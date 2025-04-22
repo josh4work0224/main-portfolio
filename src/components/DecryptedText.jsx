@@ -15,13 +15,13 @@ import { motion } from "framer-motion";
  * - className?: string          (applied to revealed/normal letters)
  * - encryptedClassName?: string (applied to encrypted letters)
  * - parentClassName?: string    (applied to the top-level span container)
- * - animateOn?: "view" | "hover"  (default: "hover")
+ * - animateOn?: "view" | "hover" | "both"
  * - fontSize?: string           (default: 'inherit')
- * - fontWeight?: string | number (default: '300')
+ * - fontWeight?: string | number (default: 'inherit')
  * - mixBlendMode?: string       (default: 'normal')
  */
 export default function DecryptedText({
-  text,
+  text = "",
   speed = 100,
   maxIterations = 10,
   sequential = false,
@@ -32,21 +32,67 @@ export default function DecryptedText({
   parentClassName = "",
   encryptedClassName = "",
   animateOn = "hover",
-  fontSize = "10vw",
-  fontWeight = "500",
+  fontSize = "inherit",
+  fontWeight = "inherit",
   mixBlendMode = "normal",
   ...props
 }) {
-  const [displayText, setDisplayText] = useState(text);
+  const [displayText, setDisplayText] = useState(text || "");
   const [isHovering, setIsHovering] = useState(false);
   const [isScrambling, setIsScrambling] = useState(false);
   const [revealedIndices, setRevealedIndices] = useState(new Set());
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (animateOn === "view" || animateOn === "both") {
+      const observerCallback = (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            setIsHovering(true);
+            setHasAnimated(true);
+          }
+        });
+      };
+
+      const observer = new IntersectionObserver(observerCallback, {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      });
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+
+      return () => {
+        if (containerRef.current) observer.unobserve(containerRef.current);
+      };
+    }
+  }, [animateOn, hasAnimated]);
+
+  const hoverProps = {
+    onMouseEnter: () => {
+      if (animateOn === "hover" || animateOn === "both") {
+        setIsHovering(true);
+        setIsFirstRender(false);
+      }
+    },
+    onMouseLeave: () => {
+      if (animateOn === "hover" || animateOn === "both") {
+        setIsHovering(false);
+      }
+    },
+  };
 
   useEffect(() => {
     let interval;
     let currentIteration = 0;
+
+    const shouldAnimate = (animateOn === "both" && (isHovering || hasAnimated)) ||
+                         (animateOn === "view" && hasAnimated) ||
+                         (animateOn === "hover" && isHovering && !isFirstRender);
 
     const getNextIndex = (revealedSet) => {
       const textLength = text.length;
@@ -125,7 +171,7 @@ export default function DecryptedText({
       }
     };
 
-    if (isHovering) {
+    if (shouldAnimate) {
       setIsScrambling(true);
       interval = setInterval(() => {
         setRevealedIndices((prevRevealed) => {
@@ -162,56 +208,7 @@ export default function DecryptedText({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [
-    isHovering,
-    text,
-    speed,
-    maxIterations,
-    sequential,
-    revealDirection,
-    characters,
-    useOriginalCharsOnly,
-  ]);
-
-  useEffect(() => {
-    if (animateOn !== "view") return;
-
-    const observerCallback = (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setIsHovering(true);
-          setHasAnimated(true);
-        }
-      });
-    };
-
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver(
-      observerCallback,
-      observerOptions
-    );
-    const currentRef = containerRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [animateOn, hasAnimated]);
-
-  const hoverProps =
-    animateOn === "hover"
-      ? {
-          onMouseEnter: () => setIsHovering(true),
-          onMouseLeave: () => setIsHovering(false),
-        }
-      : {};
+  }, [isHovering, hasAnimated, text, speed, maxIterations, sequential, revealDirection, characters, useOriginalCharsOnly, animateOn, isFirstRender]);
 
   return (
     <motion.span

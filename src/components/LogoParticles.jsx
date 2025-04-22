@@ -165,7 +165,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
               px -= f * Math.cos(t);
               py -= f * Math.sin(t);
 
-              colorChange.setHex(0xadff2f);
+              colorChange.setHex(0xccfc7e);
               colors.setXYZ(i, colorChange.r, colorChange.g, colorChange.b);
               colors.needsUpdate = true;
 
@@ -175,7 +175,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
                 py > initY + 70 ||
                 py < initY - 70
               ) {
-                colorChange.setHex(0xadff2f);
+                colorChange.setHex(0xccfc7e);
                 colors.setXYZ(i, colorChange.r, colorChange.g, colorChange.b);
                 colors.needsUpdate = true;
               }
@@ -186,7 +186,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
                   px -= 0.03 * Math.cos(t);
                   py -= 0.03 * Math.sin(t);
 
-                  colorChange.setHex(0xadff2f);
+                  colorChange.setHex(0xccfc7e);
                   colors.setXYZ(i, colorChange.r, colorChange.g, colorChange.b);
                   colors.needsUpdate = true;
 
@@ -210,7 +210,7 @@ const LogoParticles = ({ particleSize = 1.5, particleAmount = 5000 }) => {
                   py > initY + 10 ||
                   py < initY - 10
                 ) {
-                  colorChange.setHex(0xadff2f);
+                  colorChange.setHex(0xccfc7e);
                   colors.setXYZ(i, colorChange.r, colorChange.g, colorChange.b);
                   colors.needsUpdate = true;
 
