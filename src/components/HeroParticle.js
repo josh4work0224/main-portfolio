@@ -18,7 +18,7 @@ export default function Hero() {
       ref={heroRef}
       className="w-full lg:h-screen h-[100dvh] flex flex-col items-center justify-center relative mx-auto"
     >
-      <div className="fixed inset-0 z-10">
+      <div className="fixed inset-0 z-10 lg:h-screen h-[100dvh]">
         <LogoParticles particleSize={1} particleAmount={5000} />
       </div>
       {/* 使用 DecryptedText 组件显示名字 */}
