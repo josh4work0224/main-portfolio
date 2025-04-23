@@ -301,7 +301,7 @@ const WorkDetail = ({ work }) => {
         )}
         <div className="relative md:px-8 px-4 z-20">
           <div
-            className="flex flex-col max-w-[80rem] w-full h-[100vh] justify-center gap-4"
+            className="flex flex-col max-w-[80rem] w-full h-[100dvh] justify-center gap-4"
             id="text-hero"
           >
             <h1 className="md:text-7xl text-4xl">
