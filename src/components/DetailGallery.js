@@ -34,7 +34,7 @@ const DetailImageSlider = ({ images, onImageClick }) => {
 
     gsap.to(sliderRef.current, {
       x: -slideWidth * index,
-      duration: 0.5,
+      duration: 0.75,
       ease: "power2.inOut",
       onComplete: () => setIsAnimating(false),
     });
@@ -73,6 +73,18 @@ const DetailImageSlider = ({ images, onImageClick }) => {
     const handleMouseMove = (e) => {
       if (!isDragging.current) return;
       currentX.current = e.clientX;
+
+      // Add smooth drag movement
+      const diff = currentX.current - startX.current;
+      if (sliderRef.current) {
+        const slideWidth = wrapperRef.current.offsetWidth / visibleItems;
+        const currentPosition = -slideWidth * visibleStartIndex;
+        gsap.to(sliderRef.current, {
+          x: currentPosition + diff * 0.5,
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      }
     };
 
     const handleMouseUp = () => {
@@ -80,13 +92,25 @@ const DetailImageSlider = ({ images, onImageClick }) => {
       isDragging.current = false;
       slider.style.cursor = "grab";
       const diff = currentX.current - startX.current;
-      if (Math.abs(diff) > 50 && !isAnimating) {
+
+      // Add momentum-based threshold
+      const threshold = 40;
+      if (Math.abs(diff) > threshold && !isAnimating) {
         setIsAnimating(true);
         if (diff < 0) {
           handleNext();
         } else {
           handlePrev();
         }
+      } else {
+        // Return to original position with smooth easing
+        const wrapper = wrapperRef.current;
+        const slideWidth = wrapper.offsetWidth / visibleItems;
+        gsap.to(sliderRef.current, {
+          x: -slideWidth * visibleStartIndex,
+          duration: 0.5,
+          ease: "power2.out",
+        });
       }
     };
 
@@ -172,8 +196,8 @@ const DetailImageSlider = ({ images, onImageClick }) => {
           {images.map((_, i) => (
             <button
               key={`indicator-${i}`}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                i === visibleStartIndex ? "bg-white" : "bg-white/30"
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === visibleStartIndex ? "bg-white w-8" : "bg-white/30 w-2"
               }`}
               onClick={() => {
                 if (!isAnimating) {

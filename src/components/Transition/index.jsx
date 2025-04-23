@@ -66,8 +66,8 @@ export default function Transition({ children }) {
 
   const createMosaicTiles = () => {
     const { rows: gridRows, cols: gridCols } = calculateGridSize();
-    const blockWidth = 100 / (gridCols - 1);
-    const blockHeight = 100 / (gridRows - 1);
+    const blockWidth = 100 / gridCols;
+    const blockHeight = 100 / gridRows;
 
     let tiles = [];
     const totalTiles = gridRows * gridCols;
@@ -77,8 +77,8 @@ export default function Transition({ children }) {
       const col = i % gridCols;
       tiles.push({
         id: i,
-        width: `${blockWidth}%`,
-        height: `${blockHeight}%`,
+        width: `${blockWidth + 0.1}%`,
+        height: `${blockHeight + 0.1}%`,
         top: `${row * blockHeight}%`,
         left: `${col * blockWidth}%`,
         display: "none",

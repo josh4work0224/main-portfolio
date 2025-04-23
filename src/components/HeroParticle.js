@@ -36,9 +36,44 @@ export default function Hero() {
         />
       </h1>
       <div className="flex flex-row max-w-[40rem] w-full p-8 justify-between fixed bottom-[2rem] gap-2 text-center">
-        <h2>UI/UX Designer</h2>
-        <h2>Web Designer</h2>
-        <h2>Low code Developer</h2>
+        <h2>
+          <DecryptedText
+            text="UI/UX Designer"
+            speed={50}
+            maxIterations={10}
+            animateOn="view"
+            sequential={true}
+            revealDirection="left"
+            className="text-6xl font-medium text-white z-20 tracking-tight"
+            parentClassName="z-20"
+          />
+        </h2>
+        <h2>
+          <DecryptedText
+            text="Web Designer"
+            speed={20}
+            delay={500}
+            maxIterations={10}
+            animateOn="view"
+            sequential={true}
+            revealDirection="left"
+            className="text-6xl font-medium text-white z-20 tracking-tight"
+            parentClassName="z-20"
+          />
+        </h2>
+        <h2>
+          <DecryptedText
+            text="Low code Developer"
+            speed={20}
+            delay={500}
+            maxIterations={10}
+            animateOn="view"
+            sequential={true}
+            revealDirection="left"
+            className="text-6xl font-medium text-white z-20 tracking-tight"
+            parentClassName="z-20"
+          />
+        </h2>
       </div>
       <div className="flex flex-row w-auto p-2 gap-4 items-center justify-between fixed top-[4rem] lg:left-[2rem] left-[1rem] border border-gray-100/45">
         <div className="flex flex-col">

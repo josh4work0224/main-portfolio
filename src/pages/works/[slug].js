@@ -17,6 +17,7 @@ import React from "react";
 import PixelatedImage from "@/components/PixelatedImage";
 import NextButton from "@/components/nextBttoun";
 import DetailImageSlider from "@/components/DetailGallery";
+import DecryptedText from "@/components/DecryptedText";
 
 // getStaticPaths remains the same
 export async function getStaticPaths() {
@@ -303,7 +304,18 @@ const WorkDetail = ({ work }) => {
             className="flex flex-col max-w-[80rem] w-full h-[100vh] justify-center gap-4"
             id="text-hero"
           >
-            <h1 className="md:text-7xl text-4xl">{work.fields.name}</h1>
+            <h1 className="md:text-7xl text-4xl">
+              <DecryptedText
+                text={work.fields.name}
+                speed={50}
+                delay={1000}
+                startEmpty={true}
+                maxIterations={10}
+                animateOn="view"
+                sequential={true}
+                revealDirection="left"
+              />
+            </h1>
             <div className="flex flex-row gap-2">
               {Array.isArray(work.fields.type) &&
                 work.fields.type.map((categoryRef) => (

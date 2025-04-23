@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import PixelatedImage from "@/components/PixelatedImage";
+import DecryptedText from "@/components/DecryptedText";
 
 export default function Archive() {
   return (
@@ -21,7 +22,18 @@ export default function Archive() {
             About
           </span>
           <h1 className="md:text-7xl text-4xl">
-            <span className="text-lime-300">[</span>SHENGCHI
+            <span className="text-lime-300">[</span>
+            <DecryptedText
+              text="SHENGCHI"
+              hoverText="JOSH"
+              animateOn="hover"
+              speed={50}
+              maxIterations={10}
+              sequential={true}
+              revealDirection="left"
+            >
+              SHENGCHI
+            </DecryptedText>
             <span className="text-lime-300">]</span> is a web designer &
             creative developer based in Taiwan, passionate about crafting
             meaningful digital experiences.

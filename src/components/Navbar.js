@@ -64,9 +64,11 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <nav className={`w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2 ${
-      shouldBlend ? 'mix-blend-difference' : ''
-    }`}>
+    <nav
+      className={`w-full fixed top-0 left-0 row-start-1 lg:grid lg:grid-cols-3 flex items-center justify-between py-4 md:px-8 px-4 z-[999] gap-2 ${
+        shouldBlend ? "mix-blend-difference" : ""
+      }`}
+    >
       <span className="text-xl font-display lg:order-1 order-2 lg:col-span-1">
         <Link href="/" scroll={false}>
           <strong>SHENGCHI</strong> H.
@@ -113,13 +115,38 @@ export default function Navbar() {
       {/* Desktop menu */}
       <div className="hidden lg:flex gap-6 order-3 lg:col-span-1 lg:justify-end">
         <Link href="/archive" className="hover:text-gray-300" scroll={false}>
-          <DecryptedText animateOn="hover" text="Works Archive">Works Archive</DecryptedText>
+          <DecryptedText
+            animateOn="hover"
+            text="Works Archive"
+            speed={50}
+            maxIterations={10}
+            sequential={true}
+            revealDirection="left"
+          />
         </Link>
         <Link href="/about" className="hover:text-gray-300" scroll={false}>
-        <DecryptedText animateOn="hover" text="About">About</DecryptedText>
+          <DecryptedText
+            animateOn="hover"
+            text="About"
+            speed={50}
+            maxIterations={10}
+            sequential={true}
+            revealDirection="left"
+          />
         </Link>
-        <a href="mailto:josh4work0224@gmail.com" className="hover:text-gray-300" target="_blank">
-        <DecryptedText animateOn="hover" text="Let&apos;s talk">Let&apos;s talk</DecryptedText>
+        <a
+          href="mailto:josh4work0224@gmail.com"
+          className="hover:text-gray-300"
+          target="_blank"
+        >
+          <DecryptedText
+            animateOn="hover"
+            text="Let's Talk"
+            speed={50}
+            maxIterations={10}
+            sequential={true}
+            revealDirection="left"
+          />
         </a>
       </div>
 
@@ -145,7 +172,7 @@ export default function Navbar() {
           >
             About
           </Link>
-          <a 
+          <a
             href="mailto:josh4work0224@gmail.com"
             className="text-white hover:text-gray-300 text-2xl"
             target="_blank"

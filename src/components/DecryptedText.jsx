@@ -6,7 +6,10 @@ import { motion } from "framer-motion";
  *
  * Props:
  * - text: string
+ * - hoverText?: string (text to show when hovering)
  * - speed?: number
+ * - delay?: number (delay in ms before animation starts)
+ * - startEmpty?: boolean (whether to start with empty text)
  * - maxIterations?: number
  * - sequential?: boolean
  * - revealDirection?: "start" | "end" | "center"
@@ -22,7 +25,10 @@ import { motion } from "framer-motion";
  */
 export default function DecryptedText({
   text = "",
+  hoverText = "",
   speed = 100,
+  delay = 0,
+  startEmpty = false,
   maxIterations = 10,
   sequential = false,
   revealDirection = "start",
@@ -37,13 +43,39 @@ export default function DecryptedText({
   mixBlendMode = "normal",
   ...props
 }) {
-  const [displayText, setDisplayText] = useState(text || "");
+  const [displayText, setDisplayText] = useState("");
   const [isHovering, setIsHovering] = useState(false);
   const [isScrambling, setIsScrambling] = useState(false);
   const [revealedIndices, setRevealedIndices] = useState(new Set());
   const [hasAnimated, setHasAnimated] = useState(false);
   const [isFirstRender, setIsFirstRender] = useState(true);
   const containerRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  // Set initial display text based on startEmpty
+  useEffect(() => {
+    if (startEmpty || (animateOn === "view" && !hasAnimated)) {
+      setDisplayText("");
+    } else {
+      setDisplayText(text);
+    }
+  }, [startEmpty, animateOn, hasAnimated, text]);
+
+  // Reset animation state when text length changes
+  useEffect(() => {
+    setRevealedIndices(new Set());
+    setIsScrambling(false);
+    if (startEmpty || (animateOn === "view" && !hasAnimated)) {
+      setDisplayText("");
+    } else if (
+      animateOn === "hover" ||
+      (animateOn === "both" && !hasAnimated)
+    ) {
+      setDisplayText(text);
+    } else {
+      setDisplayText(isHovering && hoverText ? hoverText : text);
+    }
+  }, [isHovering, text, hoverText, animateOn, hasAnimated, startEmpty]);
 
   useEffect(() => {
     if (animateOn === "view" || animateOn === "both") {
@@ -82,6 +114,9 @@ export default function DecryptedText({
     onMouseLeave: () => {
       if (animateOn === "hover" || animateOn === "both") {
         setIsHovering(false);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
       }
     },
   };
@@ -90,12 +125,14 @@ export default function DecryptedText({
     let interval;
     let currentIteration = 0;
 
-    const shouldAnimate = (animateOn === "both" && (isHovering || hasAnimated)) ||
-                         (animateOn === "view" && hasAnimated) ||
-                         (animateOn === "hover" && isHovering && !isFirstRender);
+    const shouldAnimate =
+      (animateOn === "both" && (isHovering || hasAnimated)) ||
+      (animateOn === "view" && hasAnimated) ||
+      (animateOn === "hover" && isHovering && !isFirstRender);
 
     const getNextIndex = (revealedSet) => {
-      const textLength = text.length;
+      const currentText = isHovering && hoverText ? hoverText : text;
+      const textLength = currentText.length;
       switch (revealDirection) {
         case "start":
           return revealedSet.size;
@@ -171,44 +208,64 @@ export default function DecryptedText({
       }
     };
 
-    if (shouldAnimate) {
-      setIsScrambling(true);
-      interval = setInterval(() => {
-        setRevealedIndices((prevRevealed) => {
-          if (sequential) {
-            if (prevRevealed.size < text.length) {
-              const nextIndex = getNextIndex(prevRevealed);
-              const newRevealed = new Set(prevRevealed);
-              newRevealed.add(nextIndex);
-              setDisplayText(shuffleText(text, newRevealed));
-              return newRevealed;
+    const startAnimation = () => {
+      if (shouldAnimate) {
+        setIsScrambling(true);
+        interval = setInterval(() => {
+          setRevealedIndices((prevRevealed) => {
+            const currentText = isHovering && hoverText ? hoverText : text;
+            if (sequential) {
+              if (prevRevealed.size < currentText.length) {
+                const nextIndex = getNextIndex(prevRevealed);
+                const newRevealed = new Set(prevRevealed);
+                newRevealed.add(nextIndex);
+                setDisplayText(shuffleText(currentText, newRevealed));
+                return newRevealed;
+              } else {
+                clearInterval(interval);
+                setIsScrambling(false);
+                return prevRevealed;
+              }
             } else {
-              clearInterval(interval);
-              setIsScrambling(false);
+              setDisplayText(shuffleText(currentText, prevRevealed));
+              currentIteration++;
+              if (currentIteration >= maxIterations) {
+                clearInterval(interval);
+                setIsScrambling(false);
+                setDisplayText(currentText);
+              }
               return prevRevealed;
             }
-          } else {
-            setDisplayText(shuffleText(text, prevRevealed));
-            currentIteration++;
-            if (currentIteration >= maxIterations) {
-              clearInterval(interval);
-              setIsScrambling(false);
-              setDisplayText(text);
-            }
-            return prevRevealed;
-          }
-        });
-      }, speed);
+          });
+        }, speed);
+      }
+    };
+
+    if (delay > 0 && shouldAnimate) {
+      timeoutRef.current = setTimeout(startAnimation, delay);
     } else {
-      setDisplayText(text);
-      setRevealedIndices(new Set());
-      setIsScrambling(false);
+      startAnimation();
     }
 
     return () => {
       if (interval) clearInterval(interval);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [isHovering, hasAnimated, text, speed, maxIterations, sequential, revealDirection, characters, useOriginalCharsOnly, animateOn, isFirstRender]);
+  }, [
+    isHovering,
+    hasAnimated,
+    text,
+    hoverText,
+    speed,
+    delay,
+    maxIterations,
+    sequential,
+    revealDirection,
+    characters,
+    useOriginalCharsOnly,
+    animateOn,
+    isFirstRender,
+  ]);
 
   return (
     <motion.span
