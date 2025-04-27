@@ -93,16 +93,19 @@ export default function Home() {
         gsap.registerPlugin(ScrollTrigger);
       }
 
-      // 使用 setTimeout 確保 DOM 完全渲染
-      setTimeout(() => {
+      // 使用更長的延遲時間確保 DOM 完全渲染
+      const timer = setTimeout(() => {
         console.log("Initial load: Setting up ScrollTrigger");
         initializeScrollTrigger();
-      }, 100);
-    }
+        // 觸發自定義事件來重新初始化其他組件
+        window.dispatchEvent(new Event("homeNavigationComplete"));
+      }, 500);
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+      return () => {
+        clearTimeout(timer);
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+      };
+    }
   }, []);
 
   return (

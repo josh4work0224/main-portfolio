@@ -205,14 +205,12 @@ export default function Transition({ children }) {
           {
             opacity: 0,
             scale: 0.75,
-            transform: "translateY(20px)",
           },
           {
             opacity: 1,
             scale: 1,
             duration: 0.7,
             ease: "power2.out",
-            transform: "translateY(0)",
           }
         );
       }

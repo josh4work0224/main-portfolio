@@ -308,7 +308,7 @@ const WorkDetail = ({ work }) => {
               <DecryptedText
                 text={work.fields.name}
                 speed={50}
-                delay={1000}
+                delay={500}
                 startEmpty={true}
                 maxIterations={10}
                 animateOn="view"
