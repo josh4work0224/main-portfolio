@@ -141,7 +141,7 @@ const DetailImageSlider = ({ images, onImageClick }) => {
           {images.map((image, index) => (
             <div
               key={`image-${index}`}
-              className="md:pr-4 px-2 box-border"
+              className="md:pr-4 px-0 box-border"
               style={{ width: `${100 / images.length}%` }}
             >
               <div className="aspect-video overflow-hidden group relative">
