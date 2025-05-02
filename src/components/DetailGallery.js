@@ -141,7 +141,7 @@ const DetailImageSlider = ({ images, onImageClick }) => {
           {images.map((image, index) => (
             <div
               key={`image-${index}`}
-              className="pr-4 box-border"
+              className="md:pr-4 px-2 box-border"
               style={{ width: `${100 / images.length}%` }}
             >
               <div className="aspect-video overflow-hidden group relative">
@@ -176,14 +176,14 @@ const DetailImageSlider = ({ images, onImageClick }) => {
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-4 lg:left-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-10"
+            className="absolute left-6 lg:left-8 top-1/2 -translate-y-1/2 bg-white/40 md:hover:bg-white/80 hover:bg-white/40 md:hover:pl-4 md:hover:pr-8 hover:px-6 text-black px-6 py-2 rounded-full transition-all z-10 mix-blend-difference"
             disabled={isAnimating}
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 lg:right-12 top-1/2 -translate-y-1/2 bg-white/40 hover:bg-white/80 hover:text-black text-white p-4 md:p-6 rounded-full transition-colors z-10 "
+            className="absolute right-6 lg:right-8 top-1/2 -translate-y-1/2 bg-white/40 md:hover:bg-white/80 hover:bg-white/40 md:hover:pl-8 md:hover:pr-4 hover:px-6 text-black px-6 py-2 rounded-full transition-all z-10 mix-blend-difference"
             disabled={isAnimating}
           >
             →
