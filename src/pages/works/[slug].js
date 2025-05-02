@@ -307,7 +307,7 @@ const WorkDetail = ({ work }) => {
             <h1 className="md:text-7xl text-4xl">
               <DecryptedText
                 text={work.fields.name}
-                speed={50}
+                speed={30}
                 delay={500}
                 startEmpty={true}
                 maxIterations={10}
