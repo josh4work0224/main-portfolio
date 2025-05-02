@@ -135,7 +135,7 @@ const DetailImageSlider = ({ images, onImageClick }) => {
       <div ref={wrapperRef} className="overflow-hidden cursor-grab">
         <div
           ref={sliderRef}
-          className="flex transition-transform"
+          className="flex"
           style={{ width: `${(images.length / visibleItems) * 100}%` }}
         >
           {images.map((image, index) => (
