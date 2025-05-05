@@ -58,6 +58,11 @@ const DetailImageSlider = ({ images, onImageClick }) => {
     slideToIndex(visibleStartIndex);
   }, [visibleStartIndex, visibleItems]);
 
+  // Reset visibleStartIndex when images change
+  useEffect(() => {
+    setVisibleStartIndex(0);
+  }, [images]);
+
   // --- Drag Logic ---
   useEffect(() => {
     const slider = sliderRef.current;

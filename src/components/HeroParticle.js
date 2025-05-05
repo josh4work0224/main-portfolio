@@ -40,6 +40,8 @@ export default function Hero() {
           <DecryptedText
             text="UI/UX Designer"
             speed={50}
+            startEmpty={true}
+            delay={600}
             maxIterations={10}
             animateOn="view"
             sequential={true}
@@ -52,7 +54,8 @@ export default function Hero() {
           <DecryptedText
             text="Web Designer"
             speed={20}
-            delay={500}
+            startEmpty={true}
+            delay={800}
             maxIterations={10}
             animateOn="view"
             sequential={true}
@@ -65,7 +68,8 @@ export default function Hero() {
           <DecryptedText
             text="Low code Developer"
             speed={20}
-            delay={500}
+            startEmpty={true}
+            delay={1000}
             maxIterations={10}
             animateOn="view"
             sequential={true}
