@@ -3,6 +3,8 @@ import Transition from "@/components/Transition";
 import Navbar from "@/components/Navbar";
 import Head from "next/head";
 import { LenisProvider } from "@/components/smoothScroll";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -15,6 +17,8 @@ export default function App({ Component, pageProps }) {
         <Transition>
           <Component {...pageProps} />
         </Transition>
+        <SpeedInsights />
+        <Analytics />
       </main>
     </LenisProvider>
   );
