@@ -5,11 +5,11 @@ import { Analytics } from "@vercel/analytics/next";
 export default function Document() {
   return (
     <Html lang="en">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-        rel="stylesheet"
-      />
       <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+          rel="stylesheet"
+        />
         <link rel="icon" href="/chi4favicon.ico" />
       </Head>
       <body className="antialiased bg-black">
