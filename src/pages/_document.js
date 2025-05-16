@@ -1,4 +1,6 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function Document() {
   return (
@@ -13,6 +15,8 @@ export default function Document() {
       <body className="antialiased bg-black">
         <Main />
         <NextScript />
+        <SpeedInsights />
+        <Analytics />
       </body>
     </Html>
   );
