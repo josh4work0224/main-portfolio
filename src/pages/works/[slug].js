@@ -18,6 +18,7 @@ import PixelatedImage from "@/components/PixelatedImage";
 import NextButton from "@/components/nextBttoun";
 import DetailImageSlider from "@/components/DetailGallery";
 import DecryptedText from "@/components/DecryptedText";
+import Head from 'next/head';
 
 // getStaticPaths remains the same
 export async function getStaticPaths() {
@@ -283,6 +284,16 @@ const WorkDetail = ({ work }) => {
   if (!work) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-black text-white relative">
+      <Head>
+        {work.fields.mainImage?.fields?.file?.url && (
+          <link
+            rel="preload"
+            href={`https:${work.fields.mainImage.fields.file.url}`}
+            as="image"
+            type="image/webp"
+          />
+        )}
+      </Head>
       <div className="h-[100dvh] w-full fixed top-0">
         <div
           className="absolute w-full h-full bg-slate-900 z-20 opacity-50 brightness-100"
@@ -298,6 +309,10 @@ const WorkDetail = ({ work }) => {
               priority
               sizes="100vw"
               quality={85}
+              placeholder="blur"
+              blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                '<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#1e293b"/></svg>'
+              ).toString('base64')}`}
             />
           </div>
         )}
@@ -416,6 +431,10 @@ const WorkDetail = ({ work }) => {
                   height={1080}
                   className="object-cover w-full h-full cursor-pointer"
                   onClick={() => setIndex(0)}
+                  placeholder="blur"
+                  blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                    '<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#1e293b"/></svg>'
+                  ).toString('base64')}`}
                 />
               )}
               <div className="absolute top-4 right-4 p-2 flex flex-row">
