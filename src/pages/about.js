@@ -15,6 +15,8 @@ export default function Archive() {
             fill
             className="object-cover"
             priority
+            sizes="100vw"
+            quality={85}
           />
         </div>
         <div className="lg:col-span-5 w-full pt-[70vh] flex flex-col gap-4 lg:mb-64 mb-32">

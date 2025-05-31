@@ -19,6 +19,12 @@ const WorksArchive = ({ initialWorks }) => {
   // 添加一個 ref 來追踪 ScrollTrigger 實例
   const scrollTriggers = useRef([]);
   const shouldPreserveAnimations = useRef(false);
+  const ANIMATION_PARAMS = {
+    STAGGER_SPEED: 0.001,  // 已經很小了，可以保持
+    CONTENT_DELAY: 300,    // 從 500 減少到 300
+    LOGO_DISPLAY_TIME: 800, // 從 1000 減少到 800
+    EXIT_DELAY: 50,        // 已經很小了，可以保持
+  };
   // 檢查裝置尺寸 - 設置響應式
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -241,13 +247,15 @@ const WorksArchive = ({ initialWorks }) => {
           >
             <div className="block group rounded-[2px]">
               <div className="overflow-hidden relative w-full aspect-square flex flex-col">
-                <div className="w-full h-full">
+                <div className="w-full h-full relative">
                   {work.fields.mainImage?.fields?.file?.url && (
                     <Image
                       src={`https:${work.fields.mainImage.fields.file.url}`}
                       alt={work.fields.name || "Work image"}
                       fill
                       className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      loading="lazy"
                     />
                   )}
                   <div

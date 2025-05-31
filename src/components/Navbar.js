@@ -80,7 +80,7 @@ export default function Navbar() {
         href="/"
         scroll={false}
       >
-        <Image src="/assets/chi4logo.svg" alt="Logo" width={50} height={50} />
+        <Image src="/assets/chi4logo.svg" alt="Logo" width={50} height={50} priority />
       </Link>
 
       {/* Hamburger button */}

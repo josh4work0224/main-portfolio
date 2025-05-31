@@ -18,10 +18,10 @@ export default function Transition({ children }) {
 
   // 可調整的動畫參數
   const ANIMATION_PARAMS = {
-    STAGGER_SPEED: 0.001, // 每個馬賽克的延遲時間 (原為 0.02)
-    CONTENT_DELAY: 500, // 內容切換前的延遲時間 (原為 500)
-    LOGO_DISPLAY_TIME: 1000, // Logo 顯示時間 (原為 1000)
-    EXIT_DELAY: 50, // 退場動畫完成後的延遲 (原為 100)
+    STAGGER_SPEED: 0.001,
+    CONTENT_DELAY: 300,
+    LOGO_DISPLAY_TIME: 800,
+    EXIT_DELAY: 50,
   };
 
   const fetchWorkData = async (slug) => {

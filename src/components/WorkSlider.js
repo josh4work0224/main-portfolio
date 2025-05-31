@@ -70,6 +70,11 @@ const WorkSlider = ({ works }) => {
     return sliderData.beforeClonesCount || 0;
   }, [sliderData.beforeClonesCount]);
 
+  // 在 WorkSlider.js 中，在組件頂層添加
+  const slidePercentage = useMemo(() => {
+    return 100 / visibleItems;
+  }, [visibleItems]);
+
   // 處理滑動位置重置的函數
   const resetPosition = useCallback(() => {
     if (!sliderRef.current || !hasWorks) return;
@@ -114,14 +119,28 @@ const WorkSlider = ({ works }) => {
     if (isAnimating || !hasWorks) return;
     setIsAnimating(true);
     setCurrentIndex((prev) => prev - 1);
-  }, [isAnimating, hasWorks]);
+    
+    gsap.to(sliderRef.current, {
+      xPercent: -slidePercentage * currentIndex,
+      duration: 0.5,
+      ease: "power2.inOut",
+      onComplete: resetPosition,
+    });
+  }, [isAnimating, hasWorks, slidePercentage, currentIndex]);
 
   // 處理向後滑動
   const handleNext = useCallback(() => {
     if (isAnimating || !hasWorks) return;
     setIsAnimating(true);
     setCurrentIndex((prev) => prev + 1);
-  }, [isAnimating, hasWorks]);
+    
+    gsap.to(sliderRef.current, {
+      xPercent: -slidePercentage * currentIndex,
+      duration: 0.5,
+      ease: "power2.inOut",
+      onComplete: resetPosition,
+    });
+  }, [isAnimating, hasWorks, slidePercentage, currentIndex]);
 
   // 設定初始位置
   useEffect(() => {
@@ -237,6 +256,8 @@ const WorkSlider = ({ works }) => {
                           alt={work.fields.name || "Work image"}
                           fill
                           className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          loading="lazy"
                         />
                       )}
                       <div
