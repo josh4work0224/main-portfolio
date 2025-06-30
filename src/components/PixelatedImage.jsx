@@ -7,7 +7,8 @@ function PixelatedImage({
   alt,
   width = 1920,
   height = 1080,
-  className = "object-cover",
+  className = "",
+  aspectRatioClass = "aspect-video",
   onClick,
   initialPixelSize = 128,
 }) {
@@ -237,10 +238,16 @@ function PixelatedImage({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full ${className}`}
+      className={`relative w-full ${aspectRatioClass} ${className}`}
+      style={{ width: "100%" }}
       onClick={onClick}
     >
-      <canvas ref={canvasRef} className="w-full h-full object-cover" />
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full object-cover"
+        width={width}
+        height={height}
+      />
       {!imageLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
