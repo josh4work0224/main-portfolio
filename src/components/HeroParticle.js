@@ -2,9 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import LogoParticles from "./LogoParticles";
+import dynamic from "next/dynamic";
+// import LogoParticles from "./LogoParticles";
 import DecryptedText from "./DecryptedText";
 import TimeDisplay from "./TimeDisplay";
+
+const LogoParticles = dynamic(() => import("./LogoParticles"), {
+  ssr: false,
+});
 
 export default function Hero() {
   const heroRef = useRef(null);
@@ -19,7 +24,7 @@ export default function Hero() {
       className="w-full h-[100vh] flex flex-col items-center justify-center relative mx-auto"
     >
       <div className="fixed inset-0 z-10 lg:-translate-y-0 -translate-y-[10vh]">
-        <LogoParticles particleSize={1} particleAmount={5000} />
+        <LogoParticles particleSize={1} particleAmount={2500} />
       </div>
       {/* 使用 DecryptedText 组件显示名字 */}
       <h1 className="font-display leading-none mix-blend-difference lg:-translate-y-0 -translate-y-[10vh] text-[10vw]">

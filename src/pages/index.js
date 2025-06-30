@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { createClient } from "contentful";
 import Hero from "@/components/HeroParticle";
-import ContentfulSection from "@/components/ContentfulSection";
+// import ContentfulSection from "@/components/ContentfulSection";
 import FeaturedWorks from "@/components/FeaturedWorks";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
 
-export default function Home() {
+export default function Home({ works }) {
   const [isWorksVisible, setIsWorksVisible] = useState(false);
   const worksRef = useRef(null);
   const triggerRef = useRef(null);
@@ -124,11 +125,72 @@ export default function Home() {
         >
           <h2 className="text-2xl font-bold text-white mb-8">Spotlight on</h2>
           <div>
-            <FeaturedWorks />
+            <FeaturedWorks works={works} />
           </div>
         </section>
       </main>
       <Footer />
     </div>
   );
+}
+
+export async function getStaticProps() {
+  if (
+    !process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID ||
+    !process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN
+  ) {
+    console.error("Contentful environment variables not set correctly");
+    return {
+      props: {
+        works: [],
+      },
+    };
+  }
+
+  const client = createClient({
+    space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID,
+    accessToken: process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN,
+  });
+
+  const response = await client.getEntries({
+    content_type: "works",
+    include: 2,
+    "fields.featured": true,
+  });
+
+  const works = response.items.map((item) => {
+    const fields = { ...item.fields };
+
+    // Break the circular reference for nextProject
+    if (fields.nextProject && fields.nextProject.fields) {
+      const nextProjectFields = { ...fields.nextProject.fields };
+      // Remove the problematic nested reference to avoid circular JSON.
+      delete nextProjectFields.nextProject;
+
+      fields.nextProject = {
+        ...fields.nextProject,
+        fields: nextProjectFields,
+      };
+    }
+
+    return {
+      ...item,
+      fields: {
+        ...fields,
+        slug: item.fields.slug || item.sys.id,
+        category: Array.isArray(item.fields.category)
+          ? item.fields.category
+          : item.fields.category
+          ? [item.fields.category]
+          : [],
+      },
+    };
+  });
+
+  return {
+    props: {
+      works,
+    },
+    revalidate: 60, // Revalidate every 60 seconds
+  };
 }
